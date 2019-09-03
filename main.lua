@@ -23,6 +23,9 @@ local grid = {
 
 local click_count, title = nil, { }
 
+-- Screen Shake Animation:
+local trans, shakeDuration, shakeMagnitude = 0, -1, 0
+
 -- Local Functions:
 local function reset()
     click_count = 0
@@ -55,14 +58,32 @@ local function linesConnected()
     end
 end
 
+-- Screen Shake Animation
+local function cameraShake(duration, magnitude)
+    trans, shakeDuration, shakeMagnitude = 0, duration or 1, magnitude or 5
+end
+
 function love.load()
     reset()
     title.font = love.graphics.newFont('Assets/fonts/dotted_font.ttf', 64)
     title.text = "Connect The Dots"
     title.color = {0 / 255, 100 / 255, 0 / 255, 1}
+
+    error_sound1 = love.audio.newSource("Media/Sounds/error.wav", "static")
+    error_sound1:setVolume(.5)
+
+    error_sound2 = love.audio.newSource("Media/Sounds/error.wav", "static")
+    error_sound2:setVolume(.5)
 end
 
 function love.draw()
+
+    -- Screen Shake Animation:
+    if (trans < shakeDuration) then
+        local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
+        local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
+        love.graphics.translate(dx, dy)
+    end
 
     love.graphics.setFont(title.font)
     love.graphics.setColor(unpack(title.color))
@@ -89,14 +110,16 @@ function love.draw()
                 end
             end
 
-            local t = linesConnected()
-            if (t) then
-                love.graphics.setLineWidth(1)
-                love.graphics.setColor(unpack(t.color))
-                love.graphics.line(t.x1, t.y1, t.x2, t.y2, 0, 0, 0, 0)
-                love.graphics.setLineWidth(grid.line_width)
+            local t = connected
+            for i = 1, #connected do
+                if (connected[i]) then
+                    love.graphics.setLineWidth(1)
+                    love.graphics.setColor(unpack(t[i].color))
+                    love.graphics.line(t[i].x1, t[i].y1, t[i].x2, t[i].y2, 0, 0, 0, 0)
+                end
             end
 
+            love.graphics.setLineWidth(grid.line_width)
             love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
             love.graphics.circle('line', X, Y, grid.radius)
         end
@@ -104,13 +127,22 @@ function love.draw()
 end
 
 function alreadyConnected()
-    local t = linesConnected()
-    if (t) then
-        local px1, px2, py1, py2 = picked[1].x, picked[2].x, picked[1].y, picked[2].y
-        local X1,Y1,X2,Y2 = t.x1, t.y1, t.x2, t.y2
-        if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
-            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) then
-            return true
+    local t = connected
+    local px1, px2, py1, py2 = picked[1].x, picked[2].x, picked[1].y, picked[2].y
+
+    if (#t > 0) then
+        for i = 1,#t do
+            local X1,Y1,X2,Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
+            if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
+                (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) then
+                cameraShake(0.6, 2.5)
+                if not error_sound1:isPlaying() then
+                    error_sound1:play()
+                elseif not error_sound2:isPlaying() then
+                    error_sound2:play()
+                end
+                return true
+            end
         end
     end
 end
@@ -138,7 +170,7 @@ function HoverCheck()
     end
 end
 
-function love.update()
+function love.update(dt)
     if (click_count == 2) then
         table.insert(connected, {
             x1 = picked[1].x,
@@ -149,11 +181,10 @@ function love.update()
         })
         reset()
     end
-end
 
-function love.keypressed(key)
-    if (key == 'escape') then
-        love.event.push('quit')
+    -- Screen Shake Animation:
+    if (trans < shakeDuration) then
+        trans = trans + dt
     end
 end
 
@@ -161,19 +192,25 @@ function love.mousepressed()
     local point = HoverCheck()
 
     if (point) then
-        if alreadyConnected() then
-            click_count = click_count - 1
-            print('DOTS ALREADY CONNECTED!')
-        else
-            click_count = click_count + 1
-        end
+        click_count = click_count + 1
     end
 
     if (point) and (picked[click_count]) then
-
         picked[click_count].x = point.x
         picked[click_count].y = point.y
         picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
+        if alreadyConnected() then
+            picked[2].x = 0
+            picked[2].y = 0
+            picked[2].color = {0 / 255, 255 / 255, 0 / 255, 1}
+            click_count = click_count - 1
+            table.remove(connected[#connected])
+        end
+    end
+end
 
+function love.keypressed(key)
+    if (key == 'escape') then
+        love.event.push('quit')
     end
 end
