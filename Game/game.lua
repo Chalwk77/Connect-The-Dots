@@ -2,33 +2,37 @@ local game = { }
 game.state = "menu"
 
 -- Game Tables:
-local picked, connected = {}, {}
-local title = { }
-local grid = {
+local grid, picked, connected = { }, { }, { }
+local title, buttons, bg = { }, { }, { }
+local function initGrid(stage)
+    grid = {
 
-    x = 385, -- Grid X Coordinate
-    y = 270, -- Grid Y Coordinate
+        x = 385, -- Grid X Coordinate
+        y = 230, -- Grid Y Coordinate
 
-    spacing = 64, -- Spacing between dots
+        spacing = 64, -- Spacing between dots
 
-    radius = 10, -- Circle radius
-    line_width = 5,
+        radius = 10, -- Circle radius
+        line_width = 5,
 
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 1
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 2
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 3
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 4
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 5
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 6
-    {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 7
-}
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 1
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 2
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 3
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 4
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 5
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 6
+        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 7
+    }
+    game.state = "playing"
+end
 
 -- Local Variables:
 local click_count = nil
 local currentPlayer = 1
 local startPlayer = currentPlayer
 
--- Screen Shake Animation:
+local button_click
+local button_height, button_font = 64, nil
 local trans, shakeDuration, shakeMagnitude = 0, - 1, 0
 
 -- Local Functions:
@@ -55,6 +59,10 @@ end
 
 ------------------------------------------------------------------------------------------------------------
 
+local function StartGame()
+    initGrid()
+end
+
 function game.load(game)
     local ww, wh = love.graphics.getDimensions()
 
@@ -69,105 +77,171 @@ function game.load(game)
     error_sound2 = love.audio.newSource(game.sounds.error)
     error_sound2:setVolume(.5)
 
+    button_font = game.fonts[2]
+
     startPlayer = ( startPlayer + 1 ) % 2
     currentPlayer = startPlayer
+
+    for y = 1, 50 do
+        for x = 1, 50 do
+            local X = (x * 32)
+            local Y = (y * 32)
+            table.insert(bg, {X, Y})
+        end
+    end
+
+    ------------------ CREATE MENU BUTTONS ------------------
+    local function newButton(text, fn)
+        return {
+            text = text,
+            fn = fn,
+            now = false,
+            last = false,
+        }
+    end
+
+    button_click = love.audio.newSource(game.sounds.button_click)
+    table.insert(buttons, newButton(
+        "Easy",
+        function()
+            difficulty = "Easy"
+            StartGame()
+        end)
+    )
+    table.insert(buttons, newButton(
+        "Exit",
+        function()
+            love.event.quit(0)
+        end)
+    )
 
     reset()
 end
 
 function game.draw(dt)
+    if (game.state == "playing") then
+        -- Screen Shake Animation:
+        if (trans < shakeDuration) then
+            local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
+            local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
+            love.graphics.translate(dx, dy)
+        end
 
-    -- Screen Shake Animation:
-    if (trans < shakeDuration) then
-        local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
-        local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
-        love.graphics.translate(dx, dy)
-    end
+        love.graphics.setFont(title.font)
+        love.graphics.setColor(unpack(title.color))
+        local strwidth = title.font:getWidth(title.text)
+        local t = centerText(title, strwidth, title.font)
+        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
 
-    love.graphics.setFont(title.font)
-    love.graphics.setColor(unpack(title.color))
+        if (currentPlayer == 0) then
+            love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
+        else
+            love.graphics.setColor(127 / 255, 127 / 255, 255 / 255)
+        end
+        love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", 440, 230, 0, 0.4, 0.4)
 
-    local strwidth = title.font:getWidth(title.text)
-    local t = centerText(title, strwidth, title.font)
-    love.graphics.print(title.text, t.w, t.h - 250, 0, 1, 1, t.strW, t.fontH)
+        love.graphics.setLineWidth(grid.line_width)
+        love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
 
-    if (currentPlayer == 0) then
-        love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
+        for y = 1, #grid do
+            for x = 1, #grid[y] do
+
+                local X = (x * grid.spacing) + (grid.x)
+                local Y = (y * grid.spacing) + (grid.y)
+
+                for k, _ in ipairs(picked) do
+                    local px, py = picked[k].x, picked[k].y
+                    local color = picked[k].color
+                    if (px == X and py == Y) then
+                        love.graphics.setColor(unpack(color))
+                        love.graphics.circle('fill', X, Y, grid.radius)
+                    end
+                end
+
+                local t = connected
+                for i = 1, #connected do
+                    if (connected[i]) then
+                        love.graphics.setLineWidth(1)
+                        love.graphics.setColor(unpack(t[i].color))
+                        love.graphics.line(t[i].x1, t[i].y1, t[i].x2, t[i].y2, 0, 0, 0, 0)
+                    end
+                end
+
+
+                local MX, MY = love.mouse.getPosition()
+                if intersecting(MX, MY, X, Y, 100) then
+                    love.graphics.setLineWidth(grid.line_width + 1.5)
+                    love.graphics.setColor(230 / 255, 230 / 255, 250 / 255, 1)
+                else
+                    love.graphics.setLineWidth(grid.line_width)
+                    love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
+                end
+
+                love.graphics.circle('line', X, Y, grid.radius)
+            end
+        end
     else
-        love.graphics.setColor(127 / 255, 127 / 255, 255 / 255)
+        for k, v in ipairs(bg) do
+            local X = bg[k][1]
+            local Y = bg[k][2] - 100
+            love.graphics.setLineWidth(3)
+            love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 0.1)
+            love.graphics.circle('line', X, Y, 5)
+        end
+        RenderMenuButtons()
     end
-    love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", 440, 270, 0, 0.4, 0.4)
+end
 
-    love.graphics.setLineWidth(grid.line_width)
-    love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
+local timer = 0
+function game.update(dt)
+    if (game.state == "playing") then
 
-    for y = 1, #grid do
-        for x = 1, #grid[y] do
+        timer = timer + dt
+        if (timer >= 1) then
+            timer = 0
+            local r,g,b = love.math.random(0,255), love.math.random(0,255), love.math.random(0,255)
+            title.color = {r/255,g/255,b/255}
+        end
 
-            local X = (x * grid.spacing) + (grid.x)
-            local Y = (y * grid.spacing) + (grid.y)
+        if (click_count == 2) then
+            currentPlayer = (currentPlayer + 1) % 2
 
-            for k, _ in ipairs(picked) do
-                local px, py = picked[k].x, picked[k].y
-                local color = picked[k].color
-                if (px == X and py == Y) then
-                    love.graphics.setColor(unpack(color))
-                    love.graphics.circle('fill', X, Y, grid.radius)
-                end
-            end
+            table.insert(connected, {
+                x1 = picked[1].x,
+                y1 = picked[1].y,
+                x2 = picked[2].x,
+                y2 = picked[2].y,
+                color = {50 / 255, 255 / 255, 255 / 255, 1},
+            })
+            reset()
+        end
 
-            local t = connected
-            for i = 1, #connected do
-                if (connected[i]) then
-                    love.graphics.setLineWidth(1)
-                    love.graphics.setColor(unpack(t[i].color))
-                    love.graphics.line(t[i].x1, t[i].y1, t[i].x2, t[i].y2, 0, 0, 0, 0)
-                end
-            end
-
-            love.graphics.setLineWidth(grid.line_width)
-            love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
-            love.graphics.circle('line', X, Y, grid.radius)
+        -- Screen Shake Animation:
+        if (trans < shakeDuration) then
+            trans = trans + dt
         end
     end
 end
 
-function game.update(dt)
-    if (click_count == 2) then
-        currentPlayer = (currentPlayer + 1) % 2
-        table.insert(connected, {
-            x1 = picked[1].x,
-            y1 = picked[1].y,
-            x2 = picked[2].x,
-            y2 = picked[2].y,
-            color = {50 / 255, 255 / 255, 255 / 255, 1},
-        })
-        reset()
-    end
-
-    -- Screen Shake Animation:
-    if (trans < shakeDuration) then
-        trans = trans + dt
-    end
-end
-
 function love.mousepressed()
-    local point = HoverCheck()
+    if (game.state == "playing") then
+        local point = HoverCheck()
 
-    if (point) then
-        click_count = click_count + 1
-    end
+        if (point) then
+            click_count = click_count + 1
+        end
 
-    if (point) and (picked[click_count]) then
-        picked[click_count].x = point.x
-        picked[click_count].y = point.y
-        picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
-        if alreadyConnected() then
-            picked[2].x = 0
-            picked[2].y = 0
-            picked[2].color = {0 / 255, 255 / 255, 0 / 255, 1}
-            click_count = click_count - 1
-            table.remove(connected[#connected])
+        if (point) and (picked[click_count]) then
+            picked[click_count].x = point.x
+            picked[click_count].y = point.y
+            picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
+            if connectionError() then
+                picked[2].x = 0
+                picked[2].y = 0
+                picked[2].color = {0 / 255, 255 / 255, 0 / 255, 1}
+                click_count = click_count - 1
+                table.remove(connected[#connected])
+            end
         end
     end
 end
@@ -178,15 +252,27 @@ function game.keypressed(key)
     end
 end
 
-function alreadyConnected()
+function connectionError()
     local t = connected
     local px1, px2, py1, py2 = picked[1].x, picked[2].x, picked[1].y, picked[2].y
 
     if (#t > 0) then
         for i = 1, #t do
             local X1, Y1, X2, Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
+
+
+            -- Check if both connection points are the same dot!
+            -- if (X1 == X2) and (Y1 == Y2) and (px1 == px2) and (py1 == py1) then
+            --     if not error_sound1:isPlaying() then
+            --         error_sound1:play()
+            --     elseif not error_sound2:isPlaying() then
+            --         error_sound2:play()
+            --     end
+            -- end
+
+            -- Check if this move has already been occupied:
             if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
-            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) then
+            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) or intersecting(px1, py1, px2, py2, 100) then
                 cameraShake(0.6, 2.5)
                 if not error_sound1:isPlaying() then
                     error_sound1:play()
@@ -219,6 +305,74 @@ function HoverCheck()
                 return {x = X, y = Y}
             end
         end
+    end
+end
+
+function intersecting(x1, y1, x2, y2, radius)
+    for y = 1, #grid do
+        for x = 1, #grid[y] do
+
+            local function hovering(x1, y1, x2, y2, r)
+                if (x1 - x2) ^ 2 + (y1 - y2) ^ 2 <= r then
+                    return true
+                end
+            end
+
+            local MouseX, MouseY = love.mouse.getPosition()
+            local intersect = hovering(x1, y1, x2, y2, radius)
+            if (intersect) then
+                return true
+            end
+        end
+    end
+end
+
+function RenderMenuButtons()
+
+    local ww, wh = love.graphics.getDimensions()
+
+    local button_width = ww * (1 / 3)
+    local margin = 16
+    local total_height = (button_height + margin) * #buttons
+    local cursor_y = 0
+
+    for _, button in ipairs(buttons) do
+        button.last = button.now
+
+        local bx = (ww * 0.5) - (button_width * 0.5)
+        local by = (wh * 0.5) - (total_height * 0.5) + cursor_y
+
+        local color = {30 / 255, 150 / 255, 150 / 255, 1}
+        local mx, my = love.mouse.getPosition()
+
+        local hovering = (mx > bx) and (mx < bx + button_width) and
+        (my > by) and (my < by + button_height)
+
+        if (hovering) then
+            if (button.text == "Easy") then
+                color = { 0 / 255, 120 / 255, 0 / 255, 1 }
+            elseif (button.text == "Exit") then
+                color = { 255, 0 / 255, 0 / 255, 1 }
+            end
+        end
+
+        button.now = love.mouse.isDown(1)
+        if (button.now and not button.last and hovering) then
+            if (button.text ~= "Exit") and not button_click:isPlaying() then
+                button_click:play()
+            end
+            button.fn()
+        end
+
+        love.graphics.setColor(unpack(color))
+        love.graphics.rectangle("fill", bx, by, button_width, button_height, 64, 64)
+
+        local textW = button_font:getWidth(button.text)
+        local textH = button_font:getHeight(button.text)
+
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.print(button.text, button_font, (ww * 0.5) - textW * 0.5, by + textH * 0.5)
+        cursor_y = cursor_y + (button_height + margin)
     end
 end
 
