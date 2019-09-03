@@ -169,7 +169,7 @@ function game.draw(dt)
 
 
                 local MX, MY = love.mouse.getPosition()
-                if intersecting(MX, MY, X, Y, 100, false) then
+                if intersecting(MX, MY, X, Y, 11, false) then
                     love.graphics.setLineWidth(grid.line_width + 1.5)
                     love.graphics.setColor(230 / 255, 230 / 255, 250 / 255, 1)
                 else
@@ -199,8 +199,8 @@ function game.update(dt)
         timer = timer + dt
         if (timer >= 1) then
             timer = 0
-            local r,g,b = love.math.random(0,255), love.math.random(0,255), love.math.random(0,255)
-            title.color = {r/255,g/255,b/255}
+            local r, g, b = love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255)
+            title.color = {r / 255, g / 255, b / 255}
         end
 
         if (click_count == 2) then
@@ -225,7 +225,7 @@ end
 
 function love.mousepressed()
     if (game.state == "playing") then
-        local point = intersecting(nil, nil, nil, nil, 100, true)
+        local point = intersecting(nil, nil, nil, nil, 11, true)
 
         if (point) then
             click_count = click_count + 1
@@ -262,7 +262,7 @@ function connectionError()
 
             -- Check if this move has already been occupied:
             if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
-            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) or intersecting(px1, py1, px2, py2, 100, false) then
+            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) or intersecting(px1, py1, px2, py2, 11, false) then
                 cameraShake(0.6, 2.5)
                 if not error_sound1:isPlaying() then
                     error_sound1:play()
@@ -276,9 +276,13 @@ function connectionError()
 end
 
 local function hovering(x1, y1, x2, y2, r)
-    if ( (x1 - x2) ^ 2 + (y1 - y2) ^ 2 <= r ) then
+    local x_diff = x1 - x2
+    local y_diff = y1 - y2
+    local dist = math.sqrt(x_diff ^ 2 + y_diff ^ 2)
+    if (dist <= r) then
         return true
     end
+    return false
 end
 
 function intersecting(x1, y1, x2, y2, radius, bool)
