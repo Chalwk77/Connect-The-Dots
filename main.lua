@@ -5,7 +5,7 @@ local picked, connected = {}, {}
 local grid = {
 
     x = 120, -- Grid X Coordinate
-    y = 70, -- Grid Y Coordinate
+    y = 120, -- Grid Y Coordinate
 
     spacing = 64, -- Spacing between dots
 
@@ -22,9 +22,11 @@ local grid = {
 }
 
 local click_count, title = nil, { }
+local currentPlayer = 1
+local startPlayer = currentPlayer
 
 -- Screen Shake Animation:
-local trans, shakeDuration, shakeMagnitude = 0, -1, 0
+local trans, shakeDuration, shakeMagnitude = 0, - 1, 0
 
 -- Local Functions:
 local function reset()
@@ -34,12 +36,12 @@ local function reset()
 end
 
 local function centerText(str, strW, font)
-    local ww,wh = love.graphics.getDimensions()
+    local ww, wh = love.graphics.getDimensions()
     return {
-        w = ww/2,
-        h = wh/2,
-        strW = math.floor(strW/2),
-        fontH = math.floor(font:getHeight()/2),
+        w = ww / 2,
+        h = wh / 2,
+        strW = math.floor(strW / 2),
+        fontH = math.floor(font:getHeight() / 2),
     }
 end
 
@@ -74,6 +76,9 @@ function love.load()
 
     error_sound2 = love.audio.newSource("Media/Sounds/error.wav", "static")
     error_sound2:setVolume(.5)
+
+    startPlayer = ( startPlayer + 1 ) % 2
+    currentPlayer = startPlayer
 end
 
 function love.draw()
@@ -91,6 +96,13 @@ function love.draw()
     local strwidth = title.font:getWidth(title.text)
     local t = centerText(title, strwidth, title.font)
     love.graphics.print(title.text, t.w, t.h - 250, 0, 1, 1, t.strW, t.fontH)
+
+    if (currentPlayer == 0) then
+        love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
+    else
+        love.graphics.setColor(127 / 255, 127 / 255, 255 / 255)
+    end
+    love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", 170, 130, 0, 0.4, 0.4)
 
     love.graphics.setLineWidth(grid.line_width)
     love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
@@ -131,10 +143,10 @@ function alreadyConnected()
     local px1, px2, py1, py2 = picked[1].x, picked[2].x, picked[1].y, picked[2].y
 
     if (#t > 0) then
-        for i = 1,#t do
-            local X1,Y1,X2,Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
+        for i = 1, #t do
+            local X1, Y1, X2, Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
             if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
-                (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) then
+            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) then
                 cameraShake(0.6, 2.5)
                 if not error_sound1:isPlaying() then
                     error_sound1:play()
@@ -172,6 +184,7 @@ end
 
 function love.update(dt)
     if (click_count == 2) then
+        currentPlayer = (currentPlayer + 1) % 2
         table.insert(connected, {
             x1 = picked[1].x,
             y1 = picked[1].y,
