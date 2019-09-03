@@ -169,7 +169,7 @@ function game.draw(dt)
 
 
                 local MX, MY = love.mouse.getPosition()
-                if intersecting(MX, MY, X, Y, 100) then
+                if intersecting(MX, MY, X, Y, 100, false) then
                     love.graphics.setLineWidth(grid.line_width + 1.5)
                     love.graphics.setColor(230 / 255, 230 / 255, 250 / 255, 1)
                 else
@@ -225,7 +225,7 @@ end
 
 function love.mousepressed()
     if (game.state == "playing") then
-        local point = HoverCheck()
+        local point = intersecting(nil, nil, nil, nil, 100, true)
 
         if (point) then
             click_count = click_count + 1
@@ -260,19 +260,9 @@ function connectionError()
         for i = 1, #t do
             local X1, Y1, X2, Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
 
-
-            -- Check if both connection points are the same dot!
-            -- if (X1 == X2) and (Y1 == Y2) and (px1 == px2) and (py1 == py1) then
-            --     if not error_sound1:isPlaying() then
-            --         error_sound1:play()
-            --     elseif not error_sound2:isPlaying() then
-            --         error_sound2:play()
-            --     end
-            -- end
-
             -- Check if this move has already been occupied:
             if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
-            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) or intersecting(px1, py1, px2, py2, 100) then
+            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) or intersecting(px1, py1, px2, py2, 100, false) then
                 cameraShake(0.6, 2.5)
                 if not error_sound1:isPlaying() then
                     error_sound1:play()
@@ -285,43 +275,27 @@ function connectionError()
     end
 end
 
-function HoverCheck()
-    for y = 1, #grid do
-        for x = 1, #grid[y] do
-
-            local X = (x * grid.spacing) + (grid.x)
-            local Y = (y * grid.spacing) + (grid.y)
-
-            local function hovering(mx, my, x, y, r)
-                if (mx - x) ^ 2 + (my - y) ^ 2 <= r then
-                    return true
-                end
-            end
-
-            local MouseX, MouseY = love.mouse.getPosition()
-            local isHovering = hovering(MouseX, MouseY, X, Y, 100)
-
-            if (isHovering) then
-                return {x = X, y = Y}
-            end
-        end
+local function hovering(x1, y1, x2, y2, r)
+    if ( (x1 - x2) ^ 2 + (y1 - y2) ^ 2 <= r ) then
+        return true
     end
 end
 
-function intersecting(x1, y1, x2, y2, radius)
+function intersecting(x1, y1, x2, y2, radius, bool)
     for y = 1, #grid do
         for x = 1, #grid[y] do
 
-            local function hovering(x1, y1, x2, y2, r)
-                if (x1 - x2) ^ 2 + (y1 - y2) ^ 2 <= r then
-                    return true
-                end
+            if (bool) then
+                x2 = (x * grid.spacing) + (grid.x)
+                y2 = (y * grid.spacing) + (grid.y)
+                x1, y1 = love.mouse.getPosition()
             end
 
-            local MouseX, MouseY = love.mouse.getPosition()
             local intersect = hovering(x1, y1, x2, y2, radius)
-            if (intersect) then
+            if (intersect) and not (bool) then
                 return true
+            elseif (intersect) and (bool) then
+                return {x = x2, y = y2}
             end
         end
     end
