@@ -9,7 +9,8 @@ local grid = {
 
     spacing = 64, -- Spacing between dots
 
-    radius = 5, -- Circle radius
+    radius = 10, -- Circle radius
+    line_width = 5,
 
     {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 1
     {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 2
@@ -22,6 +23,7 @@ local grid = {
 
 local click_count, title = nil, { }
 
+-- Local Functions:
 local function reset()
     click_count = 0
     picked[1] = {x = 0, y = 0, color = {255 / 255, 255 / 255, 255 / 255, 1}}
@@ -36,6 +38,21 @@ local function centerText(str, strW, font)
         strW = math.floor(strW/2),
         fontH = math.floor(font:getHeight()/2),
     }
+end
+
+local function linesConnected()
+    local t = connected
+    for i = 1, #connected do
+        if (connected[i]) then
+            return {
+                x1 = t[i].x1,
+                y1 = t[i].y1,
+                x2 = t[i].x2,
+                y2 = t[i].y2,
+                color = {50 / 255, 255 / 255, 255 / 255, 1}
+            }
+        end
+    end
 end
 
 function love.load()
@@ -54,7 +71,7 @@ function love.draw()
     local t = centerText(title, strwidth, title.font)
     love.graphics.print(title.text, t.w, t.h - 250, 0, 1, 1, t.strW, t.fontH)
 
-    love.graphics.setLineWidth(5)
+    love.graphics.setLineWidth(grid.line_width)
     love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
 
     for y = 1, #grid do
@@ -63,25 +80,37 @@ function love.draw()
             local X = (x * grid.spacing) + (grid.x)
             local Y = (y * grid.spacing) + (grid.y)
 
-            for k, v in ipairs(picked) do
-                local dotX = picked[k].x
-                local dotY = picked[k].y
+            for k, _ in ipairs(picked) do
+                local px, py = picked[k].x, picked[k].y
                 local color = picked[k].color
-                if (dotX == X and dotY == Y) then
+                if (px == X and py == Y) then
                     love.graphics.setColor(unpack(color))
-                    love.graphics.circle('fill', X, Y, grid.radius * 2)
+                    love.graphics.circle('fill', X, Y, grid.radius)
                 end
             end
 
-            local tab = connected
-            for i = 1, #tab do
-                if (tab[i]) then
-                    love.graphics.setColor(unpack(tab[i].color))
-                    love.graphics.line(tab[i].x1, tab[i].y1, tab[i].x2, tab[i].y2, 0, 0, 0, 0)
-                end
+            local t = linesConnected()
+            if (t) then
+                love.graphics.setLineWidth(1)
+                love.graphics.setColor(unpack(t.color))
+                love.graphics.line(t.x1, t.y1, t.x2, t.y2, 0, 0, 0, 0)
+                love.graphics.setLineWidth(grid.line_width)
             end
+
             love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
             love.graphics.circle('line', X, Y, grid.radius)
+        end
+    end
+end
+
+function alreadyConnected()
+    local t = linesConnected()
+    if (t) then
+        local px1, px2, py1, py2 = picked[1].x, picked[2].x, picked[1].y, picked[2].y
+        local X1,Y1,X2,Y2 = t.x1, t.y1, t.x2, t.y2
+        if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
+            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) then
+            return true
         end
     end
 end
@@ -132,12 +161,19 @@ function love.mousepressed()
     local point = HoverCheck()
 
     if (point) then
-        click_count = click_count + 1
+        if alreadyConnected() then
+            click_count = click_count - 1
+            print('DOTS ALREADY CONNECTED!')
+        else
+            click_count = click_count + 1
+        end
     end
 
     if (point) and (picked[click_count]) then
+
         picked[click_count].x = point.x
         picked[click_count].y = point.y
         picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
+
     end
 end
