@@ -296,6 +296,13 @@ function connectionError()
         end
     end
 
+    -- Check if DotA == DotB:
+    local isSelf = function()
+        if (pRow1 == pRow2) and (pCol1 == pCol2) then
+            return true
+        end
+    end
+
     -- Check if Point2 is too far Horizontally or Vertically.
     local tooFar = function()
         if (pRow1 ~= nil and pRow2 ~= nil and pCol1 ~= nil and pCol2 ~= nil) then
@@ -320,7 +327,7 @@ function connectionError()
         end
     end
 
-    if isDiagional() or tooFar() then
+    if isDiagional() or tooFar() or isSelf() then
         alertPlayer()
         return true
     end
@@ -330,8 +337,8 @@ function connectionError()
             local X1, Y1, X2, Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
             local case1 = (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2)
             local case2 = (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1)
-            local case3 = intersecting(px1, py1, px2, py2, 11, false)
-            if (case1) or (case2) or (case3) then
+            if (case1) or (case2) then
+                alertPlayer()
                 return true
             end
         end
