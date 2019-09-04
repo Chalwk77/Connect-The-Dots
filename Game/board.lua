@@ -1,5 +1,3 @@
-local board = { }
-
 function SetBoard(size)
     local grid = { }
     if (size == "3x3") then
