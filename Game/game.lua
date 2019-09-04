@@ -1,28 +1,14 @@
 local game = { }
-game.state = "menu"
+local board = require('Game/board')
 
 -- Game Tables:
-local grid, picked, connected = { }, { }, { }
+local picked, connected = { }, { }
 local title, buttons, bg = { }, { }, { }
-local function initGrid(stage)
-    grid = {
+local grid
 
-        x = 385, -- Grid X Coordinate
-        y = 230, -- Grid Y Coordinate
 
-        spacing = 64, -- Spacing between dots
-
-        radius = 10, -- Circle radius
-        line_width = 5,
-
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 1
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 2
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 3
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 4
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 5
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 6
-        {0, 0, 0, 0, 0, 0, 0, 0}, -- Row 7
-    }
+local function initGrid(size)
+    grid = SetBoard("9x9")
     game.state = "playing"
 end
 
@@ -59,15 +45,13 @@ end
 
 ------------------------------------------------------------------------------------------------------------
 
-local function StartGame()
-    initGrid()
-end
-
 function game.load(game)
     local ww, wh = love.graphics.getDimensions()
 
-    local title_font = game.fonts[1]
+    -- Set initial game state:
+    game.state = "menu"
 
+    local title_font = game.fonts[1]
     title.font = game.fonts[1]
     title.text = "Connect The Dots"
     title.color = {0 / 255, 100 / 255, 0 / 255, 1}
@@ -105,7 +89,7 @@ function game.load(game)
         "Start Game",
         function()
             difficulty = "Easy"
-            StartGame()
+            initGrid()
         end)
     )
     table.insert(buttons, newButton(
