@@ -58,6 +58,7 @@ function loadingState.load(game, finishCallback)
     -- Preload Fonts:
     loader.newFont(game.fonts, 1, 'Assets/fonts/dotted_font.ttf', 84)
     loader.newFont(game.fonts, 2, 'Assets/fonts/arial.ttf', 32)
+    loader.newFont(game.fonts, 3, 'Assets/fonts/arial.ttf', 12)
 
     loader.load(finishCallback, print)
 end

@@ -66,16 +66,21 @@ end
 function game.load(game)
     local ww, wh = love.graphics.getDimensions()
 
-    local title_font = game.fonts[1]
-
     title.font = game.fonts[1]
     title.text = "Connect The Dots"
     title.color = {0 / 255, 100 / 255, 0 / 255, 1}
+    title.credits = {
+        font = game.fonts[3],
+        text = {
+            "Connect The Dots (Windows, Android, iOS)",
+            "Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>"
+        },
+    }
 
     error_sound1 = love.audio.newSource(game.sounds.error)
-    error_sound1:setVolume(.5)
+    error_sound1:setVolume(.8)
     error_sound2 = love.audio.newSource(game.sounds.error)
-    error_sound2:setVolume(.5)
+    error_sound2:setVolume(.8)
 
     button_font = game.fonts[2]
 
@@ -102,9 +107,8 @@ function game.load(game)
 
     button_click = love.audio.newSource(game.sounds.button_click)
     table.insert(buttons, newButton(
-        "Easy",
+        "Start",
         function()
-            difficulty = "Easy"
             StartGame()
         end)
     )
@@ -119,6 +123,16 @@ function game.load(game)
 end
 
 function game.draw(dt)
+
+    -- Render Title regardless of gamemode.
+    if (game.state == "menu" or game.state == "playing") then
+        love.graphics.setFont(title.font)
+        love.graphics.setColor(unpack(title.color))
+        local strwidth = title.font:getWidth(title.text)
+        local t = centerText(title, strwidth, title.font)
+        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
+    end
+
     if (game.state == "playing") then
         -- Screen Shake Animation:
         if (trans < shakeDuration) then
@@ -126,12 +140,6 @@ function game.draw(dt)
             local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
             love.graphics.translate(dx, dy)
         end
-
-        love.graphics.setFont(title.font)
-        love.graphics.setColor(unpack(title.color))
-        local strwidth = title.font:getWidth(title.text)
-        local t = centerText(title, strwidth, title.font)
-        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
 
         if (currentPlayer == 0) then
             love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
@@ -181,27 +189,50 @@ function game.draw(dt)
             end
         end
     else
+
+        -- Render dotted background:
         for k, v in ipairs(bg) do
             local X = bg[k][1]
             local Y = bg[k][2] - 100
             love.graphics.setLineWidth(3)
-            love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 0.1)
-            love.graphics.circle('line', X, Y, 5)
+            love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 0.2)
+            love.graphics.circle('line', X, Y, 2)
         end
+
+        -- Render Start Menu:
         RenderMenuButtons()
+
+        -- Display Copyright:
+        local font = title.credits.font
+        local text = title.credits.text
+
+        love.graphics.setFont(font)
+        love.graphics.setColor(192 / 255, 192 / 255, 192 / 255, 1)
+
+        local height, spacing = 350, 20
+        for i = 1,#text do
+            local strwidth = font:getWidth(text[i])
+            local t = centerText(text[i], strwidth, font)
+            love.graphics.print(text[i], t.w, t.h + height, 0, 1, 1, t.strW, t.fontH)
+            height = height + spacing
+        end
     end
 end
 
 local timer = 0
 function game.update(dt)
-    if (game.state == "playing") then
 
+    -- Randomize Title Color every 1 second:
+    if (game.state == "menu" or game.state == "playing") then
         timer = timer + dt
         if (timer >= 1) then
             timer = 0
             local r, g, b = love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255)
             title.color = {r / 255, g / 255, b / 255}
         end
+    end
+
+    if (game.state == "playing") then
 
         if (click_count == 2) then
             currentPlayer = (currentPlayer + 1) % 2
@@ -327,7 +358,7 @@ function RenderMenuButtons()
         (my > by) and (my < by + button_height)
 
         if (hovering) then
-            if (button.text == "Easy") then
+            if (button.text == "Start") then
                 color = { 0 / 255, 120 / 255, 0 / 255, 1 }
             elseif (button.text == "Exit") then
                 color = { 255, 0 / 255, 0 / 255, 1 }
