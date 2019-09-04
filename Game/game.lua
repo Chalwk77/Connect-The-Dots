@@ -66,21 +66,16 @@ end
 function game.load(game)
     local ww, wh = love.graphics.getDimensions()
 
+    local title_font = game.fonts[1]
+
     title.font = game.fonts[1]
     title.text = "Connect The Dots"
     title.color = {0 / 255, 100 / 255, 0 / 255, 1}
-    title.credits = {
-        font = game.fonts[3],
-        text = {
-            "Connect The Dots (Windows, Android, iOS)",
-            "Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>"
-        },
-    }
 
     error_sound1 = love.audio.newSource(game.sounds.error)
-    error_sound1:setVolume(.8)
+    error_sound1:setVolume(.5)
     error_sound2 = love.audio.newSource(game.sounds.error)
-    error_sound2:setVolume(.8)
+    error_sound2:setVolume(.5)
 
     button_font = game.fonts[2]
 
@@ -107,8 +102,9 @@ function game.load(game)
 
     button_click = love.audio.newSource(game.sounds.button_click)
     table.insert(buttons, newButton(
-        "Start",
+        "Easy",
         function()
+            difficulty = "Easy"
             StartGame()
         end)
     )
@@ -123,16 +119,6 @@ function game.load(game)
 end
 
 function game.draw(dt)
-
-    -- Render Title regardless of gamemode.
-    if (game.state == "menu" or game.state == "playing") then
-        love.graphics.setFont(title.font)
-        love.graphics.setColor(unpack(title.color))
-        local strwidth = title.font:getWidth(title.text)
-        local t = centerText(title, strwidth, title.font)
-        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
-    end
-
     if (game.state == "playing") then
         -- Screen Shake Animation:
         if (trans < shakeDuration) then
@@ -140,6 +126,13 @@ function game.draw(dt)
             local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
             love.graphics.translate(dx, dy)
         end
+
+        love.graphics.setFont(title.font)
+
+        love.graphics.setColor(unpack(title.color))
+        local strwidth = title.font:getWidth(title.text)
+        local t = centerText(title, strwidth, title.font)
+        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
 
         if (currentPlayer == 0) then
             love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
@@ -167,8 +160,8 @@ function game.draw(dt)
                 end
 
                 local t = connected
-                for i = 1, #connected do
-                    if (connected[i]) then
+                for i = 1, #t do
+                    if (t[i]) then
                         love.graphics.setLineWidth(1)
                         love.graphics.setColor(unpack(t[i].color))
                         love.graphics.line(t[i].x1, t[i].y1, t[i].x2, t[i].y2, 0, 0, 0, 0)
@@ -189,50 +182,28 @@ function game.draw(dt)
             end
         end
     else
-
-        -- Render dotted background:
         for k, v in ipairs(bg) do
             local X = bg[k][1]
             local Y = bg[k][2] - 100
             love.graphics.setLineWidth(3)
-            love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 0.2)
-            love.graphics.circle('line', X, Y, 2)
+            love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 0.1)
+            love.graphics.circle('line', X, Y, 5)
         end
-
-        -- Render Start Menu:
         RenderMenuButtons()
-
-        -- Display Copyright:
-        local font = title.credits.font
-        local text = title.credits.text
-
-        love.graphics.setFont(font)
-        love.graphics.setColor(192 / 255, 192 / 255, 192 / 255, 1)
-
-        local height, spacing = 350, 20
-        for i = 1,#text do
-            local strwidth = font:getWidth(text[i])
-            local t = centerText(text[i], strwidth, font)
-            love.graphics.print(text[i], t.w, t.h + height, 0, 1, 1, t.strW, t.fontH)
-            height = height + spacing
-        end
     end
 end
 
 local timer = 0
-function game.update(dt)
 
-    -- Randomize Title Color every 1 second:
-    if (game.state == "menu" or game.state == "playing") then
+function game.update(dt)
+    if (game.state == "playing") then
+
         timer = timer + dt
         if (timer >= 1) then
             timer = 0
             local r, g, b = love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255)
             title.color = {r / 255, g / 255, b / 255}
         end
-    end
-
-    if (game.state == "playing") then
 
         if (click_count == 2) then
             currentPlayer = (currentPlayer + 1) % 2
@@ -265,13 +236,21 @@ function love.mousepressed()
         if (point) and (picked[click_count]) then
             picked[click_count].x = point.x
             picked[click_count].y = point.y
+
+            picked[click_count].row = point.row
+            picked[click_count].col = point.col
+
             picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
             if connectionError() then
                 picked[2].x = 0
                 picked[2].y = 0
                 picked[2].color = {0 / 255, 255 / 255, 0 / 255, 1}
+                picked[2].row = 0
+                picked[2].col = 0
                 click_count = click_count - 1
-                table.remove(connected[#connected])
+                if (#connected > 0) then
+                    table.remove(connected[#connected])
+                end
             end
         end
     end
@@ -283,23 +262,76 @@ function game.keypressed(key)
     end
 end
 
+function fillSquare()
+    local t = connected
+
+    -- ROWS:
+    for x = 1, #grid do
+        -- COLS:
+        for y = 1, #grid[x] do
+
+            for i = 1, #t do
+                if (t[i]) then
+
+                end
+            end
+
+        end
+    end
+end
+
 function connectionError()
     local t = connected
     local px1, px2, py1, py2 = picked[1].x, picked[2].x, picked[1].y, picked[2].y
 
+    local pRow1, pCol1 = picked[1].row, picked[1].col
+    local pRow2, pCol2 = picked[2].row, picked[2].col
+
+    -- Check if move was diagional:
+    local isDiagional = function()
+        if (pRow1 ~= nil and pRow2 ~= nil and pCol1 ~= nil and pCol2 ~= nil) then
+            if (pRow1 ~= pRow2) and (pCol1 ~= pCol2) then
+                return true
+            end
+        end
+    end
+
+    -- Check if Point2 is too far Horizontally or Vertically.
+    local tooFar = function()
+        if (pRow1 ~= nil and pRow2 ~= nil and pCol1 ~= nil and pCol2 ~= nil) then
+            if (pRow1 == pRow2) then
+                if (pCol1 > (pCol2 + 1)) or (pCol1 < (pCol2 - 1)) then
+                    return true
+                end
+            elseif (pCol1 == pCol2) then
+                if (pRow1 > (pRow2 + 1)) or (pRow1 < (pRow2 - 1)) then
+                    return true
+                end
+            end
+        end
+    end
+
+    local function alertPlayer()
+        cameraShake(0.6, 2.5)
+        if not error_sound1:isPlaying() then
+            error_sound1:play()
+        elseif not error_sound2:isPlaying() then
+            error_sound2:play()
+        end
+    end
+
+    if isDiagional() or tooFar() then
+        alertPlayer()
+        return true
+    end
+
     if (#t > 0) then
         for i = 1, #t do
             local X1, Y1, X2, Y2 = t[i].x1, t[i].y1, t[i].x2, t[i].y2
-
-            -- Check if this move has already been occupied:
-            if (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2) or
-            (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1) or intersecting(px1, py1, px2, py2, 11, false) then
-                cameraShake(0.6, 2.5)
-                if not error_sound1:isPlaying() then
-                    error_sound1:play()
-                elseif not error_sound2:isPlaying() then
-                    error_sound2:play()
-                end
+            local case1 = (px1 == X1 and py1 == Y1 and px2 == X2 and py2 == Y2)
+            local case2 = (px1 == X2 and py1 == Y2 and px2 == X1 and py2 == Y1)
+            local case3 = intersecting(px1, py1, px2, py2, 11, false)
+            if (case1) or (case2) or (case3) then
                 return true
             end
         end
@@ -330,7 +362,7 @@ function intersecting(x1, y1, x2, y2, radius, bool)
             if (intersect) and not (bool) then
                 return true
             elseif (intersect) and (bool) then
-                return {x = x2, y = y2}
+                return {x = x2, y = y2, row = y, col = x}
             end
         end
     end
@@ -358,7 +390,7 @@ function RenderMenuButtons()
         (my > by) and (my < by + button_height)
 
         if (hovering) then
-            if (button.text == "Start") then
+            if (button.text == "Easy") then
                 color = { 0 / 255, 120 / 255, 0 / 255, 1 }
             elseif (button.text == "Exit") then
                 color = { 255, 0 / 255, 0 / 255, 1 }
