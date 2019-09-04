@@ -102,10 +102,22 @@ function game.load(game)
 
     button_click = love.audio.newSource(game.sounds.button_click)
     table.insert(buttons, newButton(
-        "Easy",
+        "Start Game",
         function()
             difficulty = "Easy"
             StartGame()
+        end)
+    )
+    table.insert(buttons, newButton(
+        "Select Board",
+        function()
+            -- TO DO
+        end)
+    )
+    table.insert(buttons, newButton(
+        "Settings",
+        function()
+            -- TO DO:
         end)
     )
     table.insert(buttons, newButton(
@@ -119,6 +131,15 @@ function game.load(game)
 end
 
 function game.draw(dt)
+
+    if (game.state == "playing" or game.state == "menu") then
+        love.graphics.setFont(title.font)
+        love.graphics.setColor(unpack(title.color))
+        local strwidth = title.font:getWidth(title.text)
+        local t = centerText(title, strwidth, title.font)
+        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
+    end
+
     if (game.state == "playing") then
         -- Screen Shake Animation:
         if (trans < shakeDuration) then
@@ -126,13 +147,6 @@ function game.draw(dt)
             local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
             love.graphics.translate(dx, dy)
         end
-
-        love.graphics.setFont(title.font)
-
-        love.graphics.setColor(unpack(title.color))
-        local strwidth = title.font:getWidth(title.text)
-        local t = centerText(title, strwidth, title.font)
-        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
 
         if (currentPlayer == 0) then
             love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
@@ -196,15 +210,18 @@ end
 local timer = 0
 
 function game.update(dt)
-    if (game.state == "playing") then
 
+    -- Render Title regardless of game mode:
+    if (game.state == "playing" or game.state == "menu") then
         timer = timer + dt
         if (timer >= 1) then
             timer = 0
             local r, g, b = love.math.random(0, 255), love.math.random(0, 255), love.math.random(0, 255)
             title.color = {r / 255, g / 255, b / 255}
         end
+    end
 
+    if (game.state == "playing") then
         if (click_count == 2) then
             currentPlayer = (currentPlayer + 1) % 2
 
@@ -390,19 +407,10 @@ function RenderMenuButtons()
         local bx = (ww * 0.5) - (button_width * 0.5)
         local by = (wh * 0.5) - (total_height * 0.5) + cursor_y
 
-        local color = {30 / 255, 150 / 255, 150 / 255, 1}
         local mx, my = love.mouse.getPosition()
 
         local hovering = (mx > bx) and (mx < bx + button_width) and
         (my > by) and (my < by + button_height)
-
-        if (hovering) then
-            if (button.text == "Easy") then
-                color = { 0 / 255, 120 / 255, 0 / 255, 1 }
-            elseif (button.text == "Exit") then
-                color = { 255, 0 / 255, 0 / 255, 1 }
-            end
-        end
 
         button.now = love.mouse.isDown(1)
         if (button.now and not button.last and hovering) then
@@ -412,13 +420,33 @@ function RenderMenuButtons()
             button.fn()
         end
 
-        love.graphics.setColor(unpack(color))
-        love.graphics.rectangle("fill", bx, by, button_width, button_height, 64, 64)
+        local button_color = {}
+        if (button.text == "Start Game") then
+            button_color = { 255 / 255, 69 / 255, 0 / 255, 1 }
+        elseif (button.text == "Select Board") then
+            button_color = { 255 / 255, 215 / 255, 0 / 255, 1 }
+        elseif (button.text == "Settings") then
+            button_color = { 0 / 255, 128 / 255, 128 / 255, 1 }
+        elseif (button.text == "Exit") then
+            button_color = { 255 / 255, 0 / 255, 0 / 255, 1 }
+        end
+
+        local text_color = {255/255, 255/255, 255/255, 1}
+
+        local curveX, curveY = 32,32
+        if not (hovering) then
+            love.graphics.setColor(unpack(button_color))
+        else
+            curveX, curveY = curveX + 45, curveY  + 45
+            text_color = {0/255, 255/255, 0/255, 1}
+            love.graphics.setColor(255/255, 255/255, 255/255, 1)
+        end
+        love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
 
         local textW = button_font:getWidth(button.text)
-        local textH = button_font:getHeight(button.text)
+        local textH = button_font:getHeight(button.text) - 10
 
-        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.setColor(unpack(text_color))
         love.graphics.print(button.text, button_font, (ww * 0.5) - textW * 0.5, by + textH * 0.5)
         cursor_y = cursor_y + (button_height + margin)
     end
