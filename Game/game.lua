@@ -473,7 +473,7 @@ function RenderMenuButtons()
         local textH = button_font:getHeight(button.text) + 20
 
         love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
-        love.graphics.setColor(255/255, 255/255, 255/255, 0.2)
+        love.graphics.setColor(255/255, 255/255, 255/255, 0.3)
         love.graphics.rectangle("fill", bx + xOff/2 , by + yOff/2, button_width - xOff, button_height - xOff, curveX2, curveY2)
 
 
