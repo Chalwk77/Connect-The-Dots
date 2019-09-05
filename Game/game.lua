@@ -97,7 +97,6 @@ function game.load(game)
     table.insert(buttons, newButton(
         "Start Game",
         function()
-            difficulty = "Easy"
 
             -- Player clicked "Start Game" without specifying board size.
             if (board_size == nil) then
@@ -505,7 +504,7 @@ function RenderMenuButtons()
         local curveX, curveY = 32,32
         local curveX2, curveY2 = 32,32
         if not (hovering) then
-            love.graphics.setLineWidth(2)
+            love.graphics.setLineWidth(5)
             love.graphics.setColor(unpack(button_color))
         else
             love.graphics.setLineWidth(5)
@@ -523,6 +522,22 @@ function RenderMenuButtons()
         love.graphics.setColor(255/255, 255/255, 255/255, 0.1)
         love.graphics.rectangle("fill", bx + xOff/2 , by + yOff/2, button_width - xOff, button_height - xOff, curveX2, curveY2)
 
+        -- Draw Dots between buttons ----------------------------------
+        love.graphics.setColor(255/255, 255/255, 255/255, 1)
+        love.graphics.setLineWidth(10)
+        local x,y = 0,0
+        local dotW, dotH = 225, 112
+        if (button.text == "Start Game") then
+            x, y = bx + dotW, by + dotH
+            love.graphics.rectangle("line", x, y, 1, 1, 100, 100)
+        elseif (button.text == "Select Board") then
+            x, y = bx + dotW, by + dotH
+            love.graphics.rectangle("line", x, y, 1, 1, 100, 100)
+        elseif (button.text == "Settings") then
+            x, y = bx + dotW, by + dotH
+            love.graphics.rectangle("line", x, y, 1, 1, 100, 100)
+        end
+        ----------------------------------------------------------------
 
         love.graphics.setColor(unpack(text_color))
         love.graphics.print(button.text, button_font, (ww * 0.5) - textW * 0.5, by + textH * 0.5)
