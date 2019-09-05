@@ -41,7 +41,7 @@ function loadingState.load(game, finishCallback)
     math.randomseed(os.time())
 
     -- Preload Static Images:
-    -- loader.newImage(game.images, 1, 'Media/images/moon.png')
+    loader.newImage(game.images, 1, 'Media/Images/board-select-bg.png')
 
     -- Preload Audio Files:
     loader.newSoundData(game.sounds, 'error', 'Media/Sounds/error.wav')

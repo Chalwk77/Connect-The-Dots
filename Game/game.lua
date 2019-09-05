@@ -1,15 +1,15 @@
 local game = { }
-local board = require('Game/board')
+local GridModule = require('Game/board')
+local board = require('Game/board-select-menu')
 
 -- Game Tables:
 local picked, connected = { }, { }
 local title, buttons, bg = { }, { }, { }
 local grid
 
-
 local function initGrid(size)
-    grid = SetBoard("9x9")
-    game.state = "playing"
+    grid = SetBoard(size)
+    gamestate = "playing"
 end
 
 -- Local Variables:
@@ -49,7 +49,7 @@ function game.load(game)
     local ww, wh = love.graphics.getDimensions()
 
     -- Set initial game state:
-    game.state = "menu"
+    gamestate = "menu"
 
     local title_font = game.fonts[1]
     title.font = game.fonts[1]
@@ -89,13 +89,15 @@ function game.load(game)
         "Start Game",
         function()
             difficulty = "Easy"
-            initGrid()
+            initGrid(board_size)
         end)
     )
     table.insert(buttons, newButton(
         "Select Board",
         function()
-            -- TO DO
+            board.load(game)
+            --board.select(game)
+            gamestate = "board-selection"
         end)
     )
     table.insert(buttons, newButton(
@@ -116,7 +118,7 @@ end
 
 function game.draw(dt)
 
-    if (game.state == "playing" or game.state == "menu") then
+    if (gamestate == "playing" or gamestate == "menu") then
         love.graphics.setFont(title.font)
         love.graphics.setColor(unpack(title.color))
         local strwidth = title.font:getWidth(title.text)
@@ -124,7 +126,7 @@ function game.draw(dt)
         love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
     end
 
-    if (game.state == "playing") then
+    if (gamestate == "playing") then
         -- Screen Shake Animation:
         if (trans < shakeDuration) then
             local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
@@ -179,7 +181,7 @@ function game.draw(dt)
                 love.graphics.circle('line', X, Y, grid.radius)
             end
         end
-    else
+    elseif (gamestate == "menu") then
         for k, v in ipairs(bg) do
             local X = bg[k][1]
             local Y = bg[k][2] - 100
@@ -188,6 +190,8 @@ function game.draw(dt)
             love.graphics.circle('line', X, Y, 5)
         end
         RenderMenuButtons()
+    elseif (gamestate == "board-selection") then
+        board.draw()
     end
 end
 
@@ -196,7 +200,7 @@ local timer = 0
 function game.update(dt)
 
     -- Render Title regardless of game mode:
-    if (game.state == "playing" or game.state == "menu") then
+    if (gamestate == "playing" or gamestate == "menu") then
         timer = timer + dt
         if (timer >= 1) then
             timer = 0
@@ -205,7 +209,7 @@ function game.update(dt)
         end
     end
 
-    if (game.state == "playing") then
+    if (gamestate == "playing") then
         if (click_count == 2) then
             currentPlayer = (currentPlayer + 1) % 2
 
@@ -227,7 +231,7 @@ function game.update(dt)
 end
 
 function love.mousepressed()
-    if (game.state == "playing") then
+    if (gamestate == "playing") then
         local point = intersecting(nil, nil, nil, nil, 11, true)
 
         if (point) then
