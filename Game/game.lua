@@ -112,7 +112,7 @@ function game.load(game)
                 10,
                 0.3,
                 function()
-                    gamestate = "none"
+                    -- sidebar.show()
                     imageButton.hide("pause")
                 end
             )
