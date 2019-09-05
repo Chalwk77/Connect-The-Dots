@@ -1,7 +1,17 @@
 local board = { }
 local backround
-local buttons = { }
+local buttons, title = { }, { }
 local ww, wh = 0,0
+
+local function centerText(str, strW, font)
+    local ww, wh = love.graphics.getDimensions()
+    return {
+        w = ww / 2,
+        h = wh / 2,
+        strW = math.floor(strW / 2),
+        fontH = math.floor(font:getHeight() / 2),
+    }
+end
 
 function board.load(game)
     ww, wh = love.graphics.getDimensions()
@@ -25,6 +35,11 @@ function board.load(game)
     -- Init Background:
     background = positionGraphic(game.images[1], 0, 0)
 
+    -- Init Scene Title:
+    title.font = game.fonts[1]
+    title.text = "Select Board Size"
+    title.color = {129 / 255, 100 / 255, 129 / 255, 1}
+
     local function newImageButton(image, size, x, y, width, height, fn)
         local imgW, imgH = image:getDimensions()
         return {
@@ -45,12 +60,12 @@ function board.load(game)
     local pos3 = positionGraphic(game.images[4], 0, 0)
     local pos4 = positionGraphic(game.images[5], 0, 0)
 
-    local screenY = 300
+    local screenY = 350
 
     table.insert(buttons, newImageButton(
         game.images[2],
         "3x3",
-        100,
+        50,
         screenY,
         pos1.width,
         pos1.height,
@@ -94,7 +109,17 @@ function board.load(game)
 end
 
 function board.draw()
+
+    -- Display background image and set background alpha:
+    love.graphics.setColor(255/255,255/255,255/255,1)
     love.graphics.draw(background.image, background.x, background.y, 0)
+
+    -- Display Scene Title:
+    love.graphics.setFont(title.font)
+    love.graphics.setColor(unpack(title.color))
+    local strwidth = title.font:getWidth(title.text)
+    local t = centerText(title, strwidth, title.font)
+    love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
 
     for _, button in ipairs(buttons) do
         button.last = button.now
@@ -103,11 +128,10 @@ function board.draw()
         local by = button.y
 
         local mx, my = love.mouse.getPosition()
-
         local hovering = (mx > bx) and (mx < bx + button.width) and (my > by) and (my < by + button.height)
         if (hovering) then
             love.graphics.setLineWidth(3)
-            love.graphics.setColor(255/255, 255/255, 0/255, 1)
+            love.graphics.setColor(255/255, 255/255, 255/255, 1)
             love.graphics.rectangle("line", bx, by, button.width, button.height)
         else
             love.graphics.setColor(255/255, 255/255, 255/255, 0.5)
@@ -118,6 +142,7 @@ function board.draw()
         if (button.now and not button.last and hovering) then
             button.fn()
         end
+        love.graphics.print(button.size, bx, by - 100)
     end
 end
 
