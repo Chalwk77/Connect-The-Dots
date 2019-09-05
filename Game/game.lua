@@ -233,7 +233,8 @@ function game.update(dt)
     end
 end
 
-function love.mousepressed()
+function love.mousepressed(x, y, button, isTouch)
+    board.mousepressed(x, y, button, isTouch)
     if (gamestate == "playing") then
         local point = intersecting(nil, nil, nil, nil, 11, true)
 

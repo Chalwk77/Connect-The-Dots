@@ -83,7 +83,7 @@ function board.load(game)
             text = board_size .. " board selected!",
             x = 300,
             y = 300,
-            duration = 3
+            duration = 2
         })
         update_text_box = true
     end
@@ -258,19 +258,33 @@ function board.draw(game)
 end
 
 local timer = 0
+
+local function reset(key)
+    update_text_box = false
+    draw_text_box, timer = false, 0
+    textbox[key] = nil
+    gamestate = "menu"
+    print('reset')
+end
+
 function board.update(dt)
     if (update_text_box) then
-        for _, box in ipairs( textbox ) do
-            if (math.floor(timer) <= box.duration) then
+        for key, box in ipairs( textbox ) do
+            if (math.floor(timer) < box.duration + 1) then
                 draw_text_box = true
             else
-                update_text_box = false
-                draw_text_box, timer = false, 0
-                table.remove(textbox[#textbox])
-                gamestate = "menu"
+                reset(key)
             end
         end
         timer = timer + dt
+    end
+end
+
+function board.mousepressed(x, y, button, isTouch)
+    if (button == 1) and (update_text_box and draw_text_box) then
+        for key, _ in ipairs( textbox ) do
+            reset(key)
+        end
     end
 end
 
