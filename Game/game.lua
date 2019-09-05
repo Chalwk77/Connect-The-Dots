@@ -89,6 +89,9 @@ function game.load(game)
         "Start Game",
         function()
             difficulty = "Easy"
+            if (board_size) == nil then
+                board_size = "3x3"
+            end
             initGrid(board_size)
         end)
     )
