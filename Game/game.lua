@@ -208,6 +208,10 @@ function game.update(dt)
         end
     end
 
+    if (gamestate == "board-selection") then
+        board.update(dt)
+    end
+
     if (gamestate == "playing") then
         if (click_count == 2) then
             currentPlayer = (currentPlayer + 1) % 2
