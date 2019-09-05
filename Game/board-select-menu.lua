@@ -6,6 +6,7 @@ local on_hover, back_button_font
 local textbox, textbox_font = { }
 
 local can_click, draw_text_box
+local showHUD
 
 local function centerText(str, strW, font)
     local ww, wh = love.graphics.getDimensions()
@@ -79,9 +80,9 @@ function board.load(game)
     local function InitTextBox()
         table.insert(textbox, {
             text = board_size .. " board selected!",
-            x = 200,
-            y = 200,
-            duration = 5
+            x = 355,
+            y = 300,
+            duration = 3
         })
         update_text_box = true
     end
@@ -150,17 +151,29 @@ function board.load(game)
             gamestate = "menu"
         end
     ))
+    showHUD = true
 end
 
 function board.draw(game)
-    if (gamestate == "board-selection") then
+    if (gamestate == "board-selection") and (showHUD) then
         -- Display background image and set background alpha:
-        love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
+        if update_text_box then
+            love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
+        else
+            love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
+        end
+
         love.graphics.draw(background.image, background.x, background.y, 0)
 
         -- Display Scene Title:
         love.graphics.setFont(title.font)
-        love.graphics.setColor(unpack(title.color))
+
+        if (update_text_box) then
+            love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
+        else
+            love.graphics.setColor(unpack(title.color))
+        end
+
         local strwidth = title.font:getWidth(title.text)
         local t = centerText(title, strwidth, title.font)
         love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
@@ -173,12 +186,16 @@ function board.draw(game)
 
             local mx, my = love.mouse.getPosition()
             local hovering = (mx > bx) and (mx < bx + button.width) and (my > by) and (my < by + button.height)
-            if (hovering) then
+            if (hovering) and not (update_text_box) then
                 love.graphics.setLineWidth(3)
                 love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
                 love.graphics.rectangle("line", bx, by, button.width, button.height, 12, 12)
             else
-                love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.3)
+                if update_text_box then
+                    love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
+                else
+                    love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.3)
+                end
             end
 
             love.graphics.draw(button.image, bx, by, 0)
@@ -241,6 +258,7 @@ function board.update(dt)
                 update_text_box = false
                 draw_text_box, timer = false, 0
                 table.remove(textbox[#textbox])
+                gamestate = "menu"
             end
         end
         timer = timer + dt
