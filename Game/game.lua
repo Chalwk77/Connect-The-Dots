@@ -7,7 +7,7 @@ local picked, connected = { }, { }
 local title, buttons, bg = { }, { }, { }
 local grid
 
-local function initGrid(size)
+local function startGame(size)
     grid = SetBoard(size)
     gamestate = "playing"
 end
@@ -89,10 +89,14 @@ function game.load(game)
         "Start Game",
         function()
             difficulty = "Easy"
-            if (board_size) == nil then
+
+            -- Player clicked "Start Game" without specifying board size.
+            if (board_size == nil) then
                 board_size = "3x3"
             end
-            initGrid(board_size)
+
+            -- Start Game:
+            startGame(board_size)
         end)
     )
     table.insert(buttons, newButton(
