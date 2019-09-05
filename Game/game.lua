@@ -64,6 +64,7 @@ function game.load(game)
 
     button_font = game.fonts[2]
     smallPrintFont = game.fonts[9]
+    turnTextFont = game.fonts[10]
 
     aboutMsg = {
         {"Connect The Dots for Windows PC", 355},
@@ -147,12 +148,18 @@ function game.draw(dt)
             love.graphics.translate(dx, dy)
         end
 
+        --
         if (currentPlayer == 0) then
-            love.graphics.setColor(127 / 255, 255 / 255, 127 / 255)
+            love.graphics.setColor(127 / 255, 255 / 255, 127 / 255, 1)
         else
-            love.graphics.setColor(127 / 255, 127 / 255, 255 / 255)
+            love.graphics.setColor(127 / 255, 127 / 255, 255 / 255, 1)
         end
-        love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", 440, 230, 0, 0.4, 0.4)
+
+        love.graphics.setFont(turnTextFont)
+        local x,y = grid.turn_text[1], grid.turn_text[2]
+        love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", x, y, 0)
+        --
+
 
         love.graphics.setLineWidth(grid.line_width)
         love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
@@ -470,10 +477,10 @@ function RenderMenuButtons()
 
         local xOff, yOff = 30, 30
         local textW = button_font:getWidth(button.text)
-        local textH = button_font:getHeight(button.text) + 20
+        local textH = button_font:getHeight(button.text)
 
         love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
-        love.graphics.setColor(255/255, 255/255, 255/255, 0.3)
+        love.graphics.setColor(255/255, 255/255, 255/255, 0.1)
         love.graphics.rectangle("fill", bx + xOff/2 , by + yOff/2, button_width - xOff, button_height - xOff, curveX2, curveY2)
 
 
