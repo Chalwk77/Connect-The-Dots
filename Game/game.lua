@@ -1,6 +1,7 @@
 local game = { }
 local GridModule = require('Game/board')
 local board = require('Game/board-select-menu')
+local imageButton = require('Game/image-button')
 
 -- Game Tables:
 local picked, connected = { }, { }
@@ -105,6 +106,9 @@ function game.load(game)
 
             -- Start Game:
             startGame(board_size)
+
+            imageButton.load(game)
+            imageButton.show('return')
         end)
     )
     table.insert(buttons, newButton(
@@ -141,6 +145,9 @@ function game.draw(dt)
     end
 
     if (gamestate == "playing") then
+
+        imageButton.draw()
+
         -- Screen Shake Animation:
         if (trans < shakeDuration) then
             local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
@@ -250,6 +257,9 @@ function game.update(dt)
     end
 
     if (gamestate == "playing") then
+
+        imageButton.update(dt)
+
         if (click_count == 2) then
             currentPlayer = (currentPlayer + 1) % 2
 

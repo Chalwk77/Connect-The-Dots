@@ -199,7 +199,7 @@ function board.draw(game)
                     love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
                     love.graphics.rectangle("line", bx, by, button.width, button.height, 12, 12)
                 else
-                    if update_text_box then
+                    if (update_text_box) then
                         love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
                     else
                         love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.3)
