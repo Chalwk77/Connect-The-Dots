@@ -45,11 +45,13 @@ function board.load(game)
     local pos3 = positionGraphic(game.images[4], 0, 0)
     local pos4 = positionGraphic(game.images[5], 0, 0)
 
+    local screenY = 300
+
     table.insert(buttons, newImageButton(
         game.images[2],
         "3x3",
         100,
-        100,
+        screenY,
         pos1.width,
         pos1.height,
         function()
@@ -59,8 +61,8 @@ function board.load(game)
     table.insert(buttons, newImageButton(
         game.images[3],
         "5x5",
-        250,
-        100,
+        270,
+        screenY,
         pos2.width,
         pos2.height,
         function()
@@ -70,8 +72,8 @@ function board.load(game)
     table.insert(buttons, newImageButton(
         game.images[4],
         "7x7",
-        700,
-        100,
+        570,
+        screenY,
         pos3.width,
         pos3.height,
         function()
@@ -81,8 +83,8 @@ function board.load(game)
     table.insert(buttons, newImageButton(
         game.images[5],
         "9x9",
-        900,
-        100,
+        950,
+        screenY,
         pos4.width,
         pos4.height,
         function()
