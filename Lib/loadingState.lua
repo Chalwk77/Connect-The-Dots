@@ -43,7 +43,7 @@ function loadingState.load(game, finishCallback)
     print("Assets are loading...")
     math.randomseed(os.time())
 
-    -- Preload Static Images:
+    ------------------- Preload Static Images:
     loader.newImage(game.images, 1, 'Media/Images/board-select-bg.png')
 
     loader.newImage(game.images, 2, 'Media/Images/board-3x3.png')
@@ -52,20 +52,27 @@ function loadingState.load(game, finishCallback)
     loader.newImage(game.images, 5, 'Media/Images/board-9x9.png')
     loader.newImage(game.images, 6, 'Media/Images/return-92x90.png')
 
-    -- Preload Audio Files:
+    ------------------- Preload Audio Files:
     loader.newSoundData(game.sounds, 'error', 'Media/Sounds/error.wav')
     loader.newSoundData(game.sounds, 'button_click', 'Media/Sounds/button_click.mp3')
     loader.newSoundData(game.sounds, 'on_hover', 'Media/Sounds/hover.wav')
 
-    -- Preload Fonts:
+    ------------------- Preload Fonts:
+
+    -- Menu Title:
     loader.newFont(game.fonts, 1, 'Assets/fonts/dotted_font.ttf', 84)
+    -- Menu Buttons:
     loader.newFont(game.fonts, 2, 'Assets/fonts/arial.ttf', 32)
     loader.newFont(game.fonts, 3, 'Assets/fonts/arial.ttf', 12)
+    -- Board Select Title:
     loader.newFont(game.fonts, 4, 'Assets/fonts/arial.ttf', 16)
     loader.newFont(game.fonts, 5, 'Assets/fonts/arial.ttf', 64)
     loader.newFont(game.fonts, 6, 'Assets/fonts/dotted_font.ttf', 104)
     loader.newFont(game.fonts, 7, 'Assets/fonts/dotted_font.ttf', 64)
     loader.newFont(game.fonts, 8, 'Assets/fonts/dotted_font.ttf', 42)
+    -- Small Print (menu)
+    loader.newFont(game.fonts, 9, 'Assets/fonts/arial.ttf', 12)
+
 
     loader.load(finishCallback, print)
 end

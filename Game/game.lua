@@ -21,6 +21,8 @@ local button_click
 local button_height, button_font = 100, nil
 local trans, shakeDuration, shakeMagnitude = 0, - 1, 0
 
+local smallPrintFont, aboutMsg
+
 -- Local Functions:
 local function reset()
     click_count = 0
@@ -51,7 +53,6 @@ function game.load(game)
     -- Set initial game state:
     gamestate = "menu"
 
-    local title_font = game.fonts[1]
     title.font = game.fonts[1]
     title.text = "Connect The Dots"
     title.color = {0 / 255, 100 / 255, 0 / 255, 1}
@@ -62,6 +63,12 @@ function game.load(game)
     error_sound2:setVolume(.5)
 
     button_font = game.fonts[2]
+    smallPrintFont = game.fonts[9]
+
+    aboutMsg = {
+        {"Connect The Dots for Windows PC", 355},
+        {"Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>", 370},
+    }
 
     startPlayer = ( startPlayer + 1 ) % 2
     currentPlayer = startPlayer
@@ -195,6 +202,22 @@ function game.draw(dt)
             love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 0.1)
             love.graphics.circle('line', X, Y, 5)
         end
+
+        -- About Message:
+        love.graphics.setFont(smallPrintFont)
+        love.graphics.setColor(255/255, 255/255, 255/255, 1)
+
+        for i = 1,#aboutMsg do
+
+            local text = aboutMsg[i][1]
+            local height = aboutMsg[i][2]
+
+            local strwidth = smallPrintFont:getWidth(text)
+            local t = centerText(text, strwidth, smallPrintFont)
+            love.graphics.print(text, t.w, t.h + height, 0, 1, 1, t.strW, t.fontH)
+        end
+
+
         RenderMenuButtons()
     elseif (gamestate == "board-selection") then
         board.draw(game)
