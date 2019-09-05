@@ -2,7 +2,7 @@ local board = { }
 local backround
 local buttons, title = { }, { }
 local ww, wh = 0,0
-local on_hover
+local on_hover, back_button_font
 
 local function centerText(str, strW, font)
     local ww, wh = love.graphics.getDimensions()
@@ -40,6 +40,8 @@ function board.load(game)
     title.font = game.fonts[1]
     title.text = "Select Board Size"
     title.color = {129 / 255, 100 / 255, 129 / 255, 1}
+
+    back_button_font = game.fonts[4]
 
     on_hover1 = love.audio.newSource(game.sounds.on_hover)
     on_hover1:setVolume(.5)
@@ -112,48 +114,66 @@ function board.load(game)
             board_size = "9x9"
         end
     ))
+    table.insert(buttons, newImageButton(
+        game.images[6],
+        "Back",
+        10,
+        10,
+        pos4.width,
+        pos4.height,
+        function()
+            gamestate = "menu"
+        end
+    ))
 end
 
-function board.draw()
+function board.draw(game)
+    if (gamestate == "board-selection") then
+        -- Display background image and set background alpha:
+        love.graphics.setColor(255/255,255/255,255/255,1)
+        love.graphics.draw(background.image, background.x, background.y, 0)
 
-    -- Display background image and set background alpha:
-    love.graphics.setColor(255/255,255/255,255/255,1)
-    love.graphics.draw(background.image, background.x, background.y, 0)
+        -- Display Scene Title:
+        love.graphics.setFont(title.font)
+        love.graphics.setColor(unpack(title.color))
+        local strwidth = title.font:getWidth(title.text)
+        local t = centerText(title, strwidth, title.font)
+        love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
 
-    -- Display Scene Title:
-    love.graphics.setFont(title.font)
-    love.graphics.setColor(unpack(title.color))
-    local strwidth = title.font:getWidth(title.text)
-    local t = centerText(title, strwidth, title.font)
-    love.graphics.print(title.text, t.w, t.h - 290, 0, 1, 1, t.strW, t.fontH)
+        for _, button in ipairs(buttons) do
+            button.last = button.now
 
-    for _, button in ipairs(buttons) do
-        button.last = button.now
+            local bx = button.x
+            local by = button.y
 
-        local bx = button.x
-        local by = button.y
-
-        local mx, my = love.mouse.getPosition()
-        local hovering = (mx > bx) and (mx < bx + button.width) and (my > by) and (my < by + button.height)
-        if (hovering) then
-            love.graphics.setLineWidth(3)
-            love.graphics.setColor(255/255, 255/255, 255/255, 1)
-            love.graphics.rectangle("line", bx, by, button.width, button.height, 12,12)
-        else
-            love.graphics.setColor(255/255, 255/255, 255/255, 0.3)
-        end
-
-        love.graphics.draw(button.image, bx, by, 0)
-        button.now = love.mouse.isDown(1)
-        if (button.now and not button.last and hovering) then
-            if not on_hover1:isPlaying() then
-                on_hover1:play()
-            elseif not on_hover2:isPlaying() then
-                on_hover2:play()
+            local mx, my = love.mouse.getPosition()
+            local hovering = (mx > bx) and (mx < bx + button.width) and (my > by) and (my < by + button.height)
+            if (hovering) then
+                love.graphics.setLineWidth(3)
+                love.graphics.setColor(255/255, 255/255, 255/255, 1)
+                love.graphics.rectangle("line", bx, by, button.width, button.height, 12,12)
+            else
+                love.graphics.setColor(255/255, 255/255, 255/255, 0.3)
             end
-            button.fn()
+
+            love.graphics.draw(button.image, bx, by, 0)
+            button.now = love.mouse.isDown(1)
+            if (button.now and not button.last and hovering) then
+                if not on_hover1:isPlaying() then
+                    on_hover1:play()
+                elseif not on_hover2:isPlaying() then
+                    on_hover2:play()
+                end
+                button.fn()
+            end
+            if (button.size == "Back") then
+                love.graphics.setFont(back_button_font)
+                love.graphics.print(button.size, bx + 30, by + 100)
+            else
+                love.graphics.setFont(title.font)
+                love.graphics.print(button.size, bx, by - 100)
+            end
         end
-        love.graphics.print(button.size, bx, by - 100)
     end
 end
 

@@ -47,6 +47,7 @@ function loadingState.load(game, finishCallback)
     loader.newImage(game.images, 3, 'Media/Images/board-5x5.png')
     loader.newImage(game.images, 4, 'Media/Images/board-7x7.png')
     loader.newImage(game.images, 5, 'Media/Images/board-9x9.png')
+    loader.newImage(game.images, 6, 'Media/Images/return-92x90.png')
 
     -- Preload Audio Files:
     loader.newSoundData(game.sounds, 'error', 'Media/Sounds/error.wav')
@@ -57,6 +58,7 @@ function loadingState.load(game, finishCallback)
     loader.newFont(game.fonts, 1, 'Assets/fonts/dotted_font.ttf', 84)
     loader.newFont(game.fonts, 2, 'Assets/fonts/arial.ttf', 32)
     loader.newFont(game.fonts, 3, 'Assets/fonts/arial.ttf', 12)
+    loader.newFont(game.fonts, 4, 'Assets/fonts/arial.ttf', 16)
 
     loader.load(finishCallback, print)
 end
