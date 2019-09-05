@@ -2,7 +2,7 @@ local imageButton = { }
 local buttons = { }
 
 function imageButton.load(game)
-    local function newImageButton(image, id, x, y, fn)
+    local function newImageButton(image, id, x, y, show, alpha, fn)
         local imageWidth, imageHeight = image:getDimensions()
         return {
             image = image,
@@ -11,10 +11,11 @@ function imageButton.load(game)
             y = y,
             width = imageWidth,
             height = imageHeight,
+            show = show,
+            alpha = alpha,
             fn = fn,
             now = false,
             last = false,
-            show = false,
         }
     end
 
@@ -24,6 +25,8 @@ function imageButton.load(game)
         "return",
         10,
         10,
+        false, -- Default Visibility
+        0.3, -- Default Alpha
         function()
             imageButton.hide("return")
         end
@@ -48,7 +51,7 @@ function imageButton.draw()
                 love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
                 love.graphics.rectangle("line", bx, by, button.width, button.height, 12, 12)
             else
-                love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.3)
+                love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, button.alpha)
             end
 
             -- Draw Button Image:
