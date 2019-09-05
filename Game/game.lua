@@ -18,7 +18,7 @@ local currentPlayer = 1
 local startPlayer = currentPlayer
 
 local button_click
-local button_height, button_font = 64, nil
+local button_height, button_font = 100, nil
 local trans, shakeDuration, shakeMagnitude = 0, - 1, 0
 
 -- Local Functions:
@@ -384,8 +384,8 @@ function RenderMenuButtons()
     local ww, wh = love.graphics.getDimensions()
 
     local button_width = ww * (1 / 3)
-    local margin = 16
-    local total_height = (button_height + margin) * #buttons
+    local margin = 24
+    local total_height = (button_height + margin) * #buttons - 150
     local cursor_y = 0
 
     for _, button in ipairs(buttons) do
@@ -433,7 +433,7 @@ function RenderMenuButtons()
         love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
 
         local textW = button_font:getWidth(button.text)
-        local textH = button_font:getHeight(button.text) - 10
+        local textH = button_font:getHeight(button.text) + 15
 
         love.graphics.setColor(unpack(text_color))
         love.graphics.print(button.text, button_font, (ww * 0.5) - textW * 0.5, by + textH * 0.5)

@@ -2,6 +2,7 @@ local board = { }
 local backround
 local buttons, title = { }, { }
 local ww, wh = 0,0
+local on_hover
 
 local function centerText(str, strW, font)
     local ww, wh = love.graphics.getDimensions()
@@ -39,6 +40,11 @@ function board.load(game)
     title.font = game.fonts[1]
     title.text = "Select Board Size"
     title.color = {129 / 255, 100 / 255, 129 / 255, 1}
+
+    on_hover1 = love.audio.newSource(game.sounds.on_hover)
+    on_hover1:setVolume(.5)
+    on_hover2 = love.audio.newSource(game.sounds.on_hover)
+    on_hover2:setVolume(.5)
 
     local function newImageButton(image, size, x, y, width, height, fn)
         local imgW, imgH = image:getDimensions()
@@ -132,14 +138,19 @@ function board.draw()
         if (hovering) then
             love.graphics.setLineWidth(3)
             love.graphics.setColor(255/255, 255/255, 255/255, 1)
-            love.graphics.rectangle("line", bx, by, button.width, button.height)
+            love.graphics.rectangle("line", bx, by, button.width, button.height, 12,12)
         else
-            love.graphics.setColor(255/255, 255/255, 255/255, 0.5)
+            love.graphics.setColor(255/255, 255/255, 255/255, 0.3)
         end
 
         love.graphics.draw(button.image, bx, by, 0)
         button.now = love.mouse.isDown(1)
         if (button.now and not button.last and hovering) then
+            if not on_hover1:isPlaying() then
+                on_hover1:play()
+            elseif not on_hover2:isPlaying() then
+                on_hover2:play()
+            end
             button.fn()
         end
         love.graphics.print(button.size, bx, by - 100)

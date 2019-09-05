@@ -51,6 +51,7 @@ function loadingState.load(game, finishCallback)
     -- Preload Audio Files:
     loader.newSoundData(game.sounds, 'error', 'Media/Sounds/error.wav')
     loader.newSoundData(game.sounds, 'button_click', 'Media/Sounds/button_click.mp3')
+    loader.newSoundData(game.sounds, 'on_hover', 'Media/Sounds/hover.wav')
 
     -- Preload Fonts:
     loader.newFont(game.fonts, 1, 'Assets/fonts/dotted_font.ttf', 84)
