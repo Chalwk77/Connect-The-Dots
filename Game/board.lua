@@ -1,3 +1,6 @@
+-- Grid Setup Utility for Connect The Dots.
+-- Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>
+
 function SetBoard(size)
     local grid = { }
     if (size == "3x3") then

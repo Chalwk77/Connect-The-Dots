@@ -1,3 +1,6 @@
+-- Board Selection Menu Module for Connect The Dots.
+-- Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>
+
 local board = { }
 local backround
 local buttons, title = { }, { }

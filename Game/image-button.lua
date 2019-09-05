@@ -1,3 +1,6 @@
+-- Image Button Utility for Connect The Dots.
+-- Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>
+
 local imageButton = { }
 local buttons = { }
 
@@ -42,7 +45,10 @@ function imageButton.draw()
             local bx = button.x
             local by = button.y
 
+            -- Returns Mouse X,Y world coordinates:
             local mx, my = love.mouse.getPosition()
+
+            -- Returns True if the mouse is hovering over a button image:
             local hovering = (mx > bx) and (mx < bx + button.width) and (my > by) and (my < by + button.height)
 
             -- Draw rectangle around image:
@@ -51,12 +57,14 @@ function imageButton.draw()
                 love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
                 love.graphics.rectangle("line", bx, by, button.width, button.height, 12, 12)
             else
+                -- Set default button color & alpha.
                 love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, button.alpha)
             end
 
             -- Draw Button Image:
             love.graphics.draw(button.image, bx, by, 0)
 
+            -- Check if button has been clicked -> Execute button function.
             button.now = love.mouse.isDown(1)
             if (button.now and not button.last and hovering) then
                 button.fn()
