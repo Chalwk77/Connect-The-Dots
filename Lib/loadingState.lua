@@ -50,7 +50,10 @@ function loadingState.load(game, finishCallback)
     loader.newImage(game.images, 3, 'Media/Images/board-5x5.png')
     loader.newImage(game.images, 4, 'Media/Images/board-7x7.png')
     loader.newImage(game.images, 5, 'Media/Images/board-9x9.png')
+    -- Back Button:
     loader.newImage(game.images, 6, 'Media/Images/return-92x90.png')
+    -- Pause Button:
+    loader.newImage(game.images, 7, 'Media/Images/pause-92-90.png')
 
     ------------------- Preload Audio Files:
     loader.newSoundData(game.sounds, 'error', 'Media/Sounds/error.wav')

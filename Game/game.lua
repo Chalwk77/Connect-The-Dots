@@ -104,6 +104,21 @@ function game.load(game)
                 board_size = "3x3"
             end
 
+            -- Create Pause Button:
+            imageButton.new(
+                game.images[7],
+                'pause',
+                10,
+                10,
+                0.3,
+                function()
+                    gamestate = "none"
+                    imageButton.hide("pause")
+                end
+            )
+            imageButton.show('pause')
+            ---------------------------------------------------
+
             -- Start Game:
             startGame(board_size)
         end)
@@ -112,8 +127,6 @@ function game.load(game)
         "Select Board",
         function()
             board.load(game)
-
-            gamestate = "board-selection"
 
             -- Create Back Button:
             imageButton.new(
@@ -129,6 +142,8 @@ function game.load(game)
             )
             imageButton.show('return')
             ---------------------------------------------------
+            -- Go To Scene:
+            gamestate = "board-selection"
         end)
     )
     table.insert(buttons, newButton(

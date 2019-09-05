@@ -59,6 +59,7 @@ function imageButton.draw()
             button.now = love.mouse.isDown(1)
             if (button.now and not button.last and hovering) then
                 button.fn()
+                print(button.id)
             end
         end
     end
