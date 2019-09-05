@@ -34,6 +34,9 @@ local function drawLoadingBar()
 
         love.graphics.printf(("Loading ... %d%%"):format(percent * 100), 0, y + 150, width, "center")
     end
+
+    love.graphics.setColor(47,79,79, 1)
+    love.graphics.rectangle("fill", x + posX, y + posY, w, h)
 end
 
 function loadingState.load(game, finishCallback)
