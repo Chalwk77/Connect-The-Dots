@@ -96,7 +96,6 @@ function game.load(game)
         "Select Board",
         function()
             board.load(game)
-            --board.select(game)
             gamestate = "board-selection"
         end)
     )
@@ -423,8 +422,10 @@ function RenderMenuButtons()
 
         local curveX, curveY = 32,32
         if not (hovering) then
+            love.graphics.setLineWidth(2)
             love.graphics.setColor(unpack(button_color))
         else
+            love.graphics.setLineWidth(5)
             curveX, curveY = curveX + 45, curveY  + 45
             text_color = {0/255, 255/255, 0/255, 1}
             love.graphics.setColor(255/255, 255/255, 255/255, 1)
