@@ -1,6 +1,8 @@
 -- Board Selection Menu Module for Connect The Dots.
 -- Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>
 
+local imageButton = require('Game/image-button')
+
 ---------- Local Tables ----------
 local board = { }
 local buttons, title = { }, { }
@@ -86,7 +88,12 @@ function board.load(game)
             text = board_size .. " board selected!",
             x = 300,
             y = 300,
-            duration = 2
+            duration = 2,
+            color = {
+                {100 / 255, 100 / 255, 100 / 255, 1}, -- rectangle color
+                {0 / 255, 255 / 255, 0 / 255, 1}, -- text color
+                {0 / 255, 0 / 255, 80 / 255, 0.5} -- inner rectangle color
+            }
         })
         update_text_box = true
     end
@@ -169,7 +176,7 @@ function board.draw()
             love.graphics.setFont(title.font)
 
             if (update_text_box) then
-                love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
+                love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.05)
             else
                 love.graphics.setColor(unpack(title.color))
             end
@@ -192,7 +199,7 @@ function board.draw()
                     love.graphics.rectangle("line", bx, by, button.width, button.height, 12, 12)
                 else
                     if (update_text_box) then
-                        love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
+                        love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.05)
                     else
                         love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.3)
                     end
@@ -219,26 +226,19 @@ function board.draw()
         if (draw_text_box) then
             for _, box in ipairs( textbox ) do
 
-                local color = {
-                    {30 / 255, 30 / 255, 30 / 255, 1}, -- rectangle color
-                    {0 / 255, 255 / 255, 0 / 255, 1}, -- text color
-                    {0 / 255, 0 / 255, 80 / 255, 0.5} -- inner rectangle color
-                }
-
                 local xOff, yOff = 30, 30
 
                 local textW = textbox_font:getWidth(box.text) + xOff
                 local textH = textbox_font:getHeight(box.text) + yOff
 
                 love.graphics.setLineWidth(8)
-                love.graphics.setColor(unpack(color[1]))
+                love.graphics.setColor(unpack(box.color[1]))
                 love.graphics.rectangle("line", box.x, box.y, textW, textH, 24, 24)
 
-                love.graphics.setColor(unpack(color[3]))
-
+                love.graphics.setColor(unpack(box.color[3]))
                 love.graphics.rectangle("fill", box.x + xOff/2 , box.y + yOff/2, textW - xOff, textH - xOff, 0, 0)
 
-                love.graphics.setColor(unpack(color[2]))
+                love.graphics.setColor(unpack(box.color[2]))
                 love.graphics.print(box.text, textbox_font, box.x + xOff/2, box.y + yOff/2)
             end
         end
@@ -252,7 +252,7 @@ local function reset(key)
     draw_text_box, timer = false, 0
     textbox[key] = nil
     gamestate = "menu"
-    print('reset')
+    imageButton.hide('return')
 end
 
 function board.update(dt)

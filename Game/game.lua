@@ -113,6 +113,9 @@ function game.load(game)
                 function()
                     -- sidebar.show()
                     imageButton.hide("pause")
+
+                    -- TEMP: 
+                    gamestate = "menu"
                 end
             )
             imageButton.show('pause')

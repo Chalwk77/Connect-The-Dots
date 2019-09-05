@@ -48,11 +48,11 @@ function SetBoard(size)
     elseif (size == "9x9") then
         grid = {
             x = 360,
-            y = 230,
+            y = 150,
             spacing = 64,
             radius = 10,
             line_width = 5,
-            turn_text = {360 + 50, 230 + 20},
+            turn_text = {360 + 50, 150 + 20},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
