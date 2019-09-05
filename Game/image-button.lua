@@ -4,41 +4,32 @@
 local imageButton = { }
 local buttons = { }
 
-function imageButton.load(game)
-    local function newImageButton(image, id, x, y, show, alpha, fn)
-        local imageWidth, imageHeight = image:getDimensions()
+function imageButton.new(Image, ID, X, Y, Alpha, Function)
+    local imageWidth, imageHeight = Image:getDimensions()
+
+    local function Add(a, b, c, d, e, f)
+        local imageWidth, imageHeight = Image:getDimensions()
         return {
-            image = image,
-            id = id,
-            x = x,
-            y = y,
+            image = a,
+            id = b,
+            x = c,
+            y = d,
             width = imageWidth,
             height = imageHeight,
-            show = show,
-            alpha = alpha,
-            fn = fn,
+            alpha = e,
+            fn = f,
+            show = false,
             now = false,
             last = false,
         }
     end
 
-    -- Back Button:
-    table.insert(buttons, newImageButton(
-        game.images[6],
-        "return",
-        10,
-        10,
-        false, -- Default Visibility
-        0.3, -- Default Alpha
-        function()
-            imageButton.hide("return")
-        end
-    ))
-
+    table.insert(buttons, Add(Image, ID, X, Y, Alpha, Function))
 end
 
 function imageButton.draw()
-    for _, button in ipairs(buttons) do
+    for k, button in ipairs(buttons) do
+
         if (button.show) then
             button.last = button.now
 

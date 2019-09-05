@@ -106,16 +106,29 @@ function game.load(game)
 
             -- Start Game:
             startGame(board_size)
-
-            imageButton.load(game)
-            imageButton.show('return')
         end)
     )
     table.insert(buttons, newButton(
         "Select Board",
         function()
             board.load(game)
+
             gamestate = "board-selection"
+
+            -- Create Back Button:
+            imageButton.new(
+                game.images[6],
+                'return',
+                10,
+                10,
+                0.3,
+                function()
+                    gamestate = "menu"
+                    imageButton.hide("return")
+                end
+            )
+            imageButton.show('return')
+            ---------------------------------------------------
         end)
     )
     table.insert(buttons, newButton(
@@ -234,7 +247,8 @@ function game.draw(dt)
 
         RenderMenuButtons()
     elseif (gamestate == "board-selection") then
-        board.draw(game)
+        board.draw()
+        imageButton.draw()
     end
 end
 
@@ -254,6 +268,7 @@ function game.update(dt)
 
     if (gamestate == "board-selection") then
         board.update(dt)
+        imageButton.update(dt)
     end
 
     if (gamestate == "playing") then

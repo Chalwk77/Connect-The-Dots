@@ -1,13 +1,15 @@
 -- Board Selection Menu Module for Connect The Dots.
 -- Copyright (c) 2019, Jericho Crosby <jericho.crosby227@gmail.com>
 
+---------- Local Tables ----------
 local board = { }
-local backround
 local buttons, title = { }, { }
-local ww, wh = 0, 0
-local on_hover, back_button_font
 local textbox, textbox_font = { }
 
+---------- Variables ----------
+local backround
+local ww, wh = 0, 0
+local on_hover, back_button_font
 local can_click, draw_text_box
 local initDelay
 
@@ -23,7 +25,6 @@ end
 
 function board.load(game)
     ww, wh = love.graphics.getDimensions()
-
     can_click = true
 
     local function positionGraphic(image, X, Y)
@@ -51,7 +52,6 @@ function board.load(game)
     title.text = "Select Board Size"
     title.color = {129 / 255, 100 / 255, 129 / 255, 1}
 
-    back_button_font = game.fonts[4]
     textbox_font = game.fonts[7]
 
     on_hover1 = love.audio.newSource(game.sounds.on_hover)
@@ -143,22 +143,10 @@ function board.load(game)
             can_click = false
         end
     ))
-    table.insert(buttons, newImageButton(
-        game.images[6],
-        "Back",
-        10,
-        10,
-        pos4.width,
-        pos4.height,
-        function()
-            can_click = false
-            gamestate = "menu"
-        end
-    ))
     delay_display, initDelay = 0, true
 end
 
-function board.draw(game)
+function board.draw()
 
     if (initDelay) then
         delay_display = delay_display + 1
@@ -167,8 +155,9 @@ function board.draw(game)
     if (delay_display > 10) then
         initDelay = false
         if (gamestate == "board-selection") then
+
             -- Display background image and set background alpha:
-            if update_text_box then
+            if (update_text_box) then
                 love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
             else
                 love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
@@ -221,13 +210,9 @@ function board.draw(game)
                         button.fn()
                     end
                 end
-                if (button.size == "Back") then
-                    love.graphics.setFont(back_button_font)
-                    love.graphics.print(button.size, bx + 30, by + 100)
-                else
-                    love.graphics.setFont(title.font2)
-                    love.graphics.print(button.size, bx, by - 60)
-                end
+
+                love.graphics.setFont(title.font2)
+                love.graphics.print(button.size, bx, by - 60)
             end
         end
 
