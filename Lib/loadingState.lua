@@ -63,6 +63,9 @@ function loadingState.load(game, finishCallback)
     loader.newFont(game.fonts, 3, 'Assets/fonts/arial.ttf', 12)
     loader.newFont(game.fonts, 4, 'Assets/fonts/arial.ttf', 16)
     loader.newFont(game.fonts, 5, 'Assets/fonts/arial.ttf', 64)
+    loader.newFont(game.fonts, 6, 'Assets/fonts/dotted_font.ttf', 104)
+    loader.newFont(game.fonts, 7, 'Assets/fonts/dotted_font.ttf', 64)
+    loader.newFont(game.fonts, 8, 'Assets/fonts/dotted_font.ttf', 42)
 
     loader.load(finishCallback, print)
 end
