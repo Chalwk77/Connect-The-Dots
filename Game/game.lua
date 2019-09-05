@@ -456,19 +456,26 @@ function RenderMenuButtons()
         local text_color = {255/255, 255/255, 255/255, 1}
 
         local curveX, curveY = 32,32
+        local curveX2, curveY2 = 32,32
         if not (hovering) then
             love.graphics.setLineWidth(2)
             love.graphics.setColor(unpack(button_color))
         else
             love.graphics.setLineWidth(5)
             curveX, curveY = curveX + 45, curveY  + 45
+            curveX2, curveY2 = curveX2 + 400, curveY2 + 400
             text_color = {0/255, 255/255, 0/255, 1}
             love.graphics.setColor(255/255, 255/255, 255/255, 1)
         end
-        love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
 
+        local xOff, yOff = 30, 30
         local textW = button_font:getWidth(button.text)
-        local textH = button_font:getHeight(button.text) + 15
+        local textH = button_font:getHeight(button.text) + 20
+
+        love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
+        love.graphics.setColor(255/255, 255/255, 255/255, 0.2)
+        love.graphics.rectangle("fill", bx + xOff/2 , by + yOff/2, button_width - xOff, button_height - xOff, curveX2, curveY2)
+
 
         love.graphics.setColor(unpack(text_color))
         love.graphics.print(button.text, button_font, (ww * 0.5) - textW * 0.5, by + textH * 0.5)
