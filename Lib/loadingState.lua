@@ -43,6 +43,11 @@ function loadingState.load(game, finishCallback)
     -- Preload Static Images:
     loader.newImage(game.images, 1, 'Media/Images/board-select-bg.png')
 
+    loader.newImage(game.images, 2, 'Media/Images/board-3x3.png')
+    loader.newImage(game.images, 3, 'Media/Images/board-5x5.png')
+    loader.newImage(game.images, 4, 'Media/Images/board-7x7.png')
+    loader.newImage(game.images, 5, 'Media/Images/board-9x9.png')
+
     -- Preload Audio Files:
     loader.newSoundData(game.sounds, 'error', 'Media/Sounds/error.wav')
     loader.newSoundData(game.sounds, 'button_click', 'Media/Sounds/button_click.mp3')

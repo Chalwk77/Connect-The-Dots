@@ -191,7 +191,7 @@ function game.draw(dt)
         end
         RenderMenuButtons()
     elseif (gamestate == "board-selection") then
-        board.draw()
+        board.draw(game)
     end
 end
 
