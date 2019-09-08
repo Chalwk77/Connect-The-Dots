@@ -114,7 +114,7 @@ function game.load(game)
                     -- sidebar.show()
                     imageButton.hide("pause")
 
-                    -- TEMP: 
+                    -- TEMP:
                     gamestate = "menu"
                 end
             )
@@ -314,7 +314,9 @@ end
 
 function love.mousepressed(x, y, button, isTouch)
     board.mousepressed(x, y, button, isTouch)
+
     if (gamestate == "playing") then
+
         local point = intersecting(nil, nil, nil, nil, 11, true)
 
         if (point) then

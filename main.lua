@@ -14,7 +14,6 @@ local function loadingFinished()
     currentState.load(game)
 end
 
-
 function love.load()
 
     local cursor = love.mouse.newCursor("Media/Images/cursor.png")
