@@ -20,16 +20,15 @@ local function Check(pos)
         (pos.a == 2 and pos.b == 1 and pos.c == 2 and pos.d == 2) or
         (pos.a == 2 and pos.b == 2 and pos.c == 2 and pos.d == 2) or
         (pos.a == 1 and pos.b == 2 and pos.c == 2 and pos.d == 2) then
-        print('match -> ' .. pos.id, 2+8)
-        return true
+        return pos.capture
     end
 end
 
-function gridlock.check(params)
+function gridlock.Check(params)
     local params = params or { }
 
     local grid = params.grid
-    local row,col = params.picked[2].x, params.picked[2].y
+    local row,col = params.row, params.col
 
     local position = {}
 
@@ -43,6 +42,7 @@ function gridlock.check(params)
                         b = grid[row][col + 1],
                         c = grid[row + 1][col],
                         d = grid[row + 1][col + 1],
+                        capture = {row, col},
                         id = "Top Left"
                     }
                 elseif (row == #grid) then
@@ -51,6 +51,7 @@ function gridlock.check(params)
                         b = grid[row][col - 1],
                         c = grid[row + 1][col],
                         d = grid[row + 1][col - 1],
+                        capture = {row, col},
                         id = "Top Right"
                     }
                 end
@@ -61,6 +62,7 @@ function gridlock.check(params)
                         b = grid[row][col + 1],
                         c = grid[row - 1][col],
                         d = grid[row - 1][col + 1],
+                        capture = {row, col},
                         id = "Bottom Left"
                     }
                 elseif (row == #grid) then
@@ -69,6 +71,7 @@ function gridlock.check(params)
                         b = grid[row][col - 1],
                         c = grid[row - 1][col],
                         d = grid[row][col - 1],
+                        capture = {row, col},
                         id = "Bottom Right"
                     }
                 end
@@ -80,6 +83,7 @@ function gridlock.check(params)
                         b = grid[row][col + 1],
                         c = grid[row + 1][col],
                         d = grid[row + 1][col + 1],
+                        capture = {row, col},
                         id = "alt 1"
                     }
                     position["alt 2"] = {
@@ -87,6 +91,7 @@ function gridlock.check(params)
                         b = grid[row][col - 1],
                         c = grid[row + 1][col],
                         d = grid[row + 1][col - 1],
+                        capture = {row, col},
                         id = "alt 2"
                     }
                 elseif (row == #grid) then
@@ -95,6 +100,7 @@ function gridlock.check(params)
                         b = grid[row][col + 1],
                         c = grid[row - 1][col],
                         d = grid[row - 1][col + 1],
+                        capture = {row, col},
                         id = "alt 3"
                     }
                     position["alt 4"] = {
@@ -102,6 +108,7 @@ function gridlock.check(params)
                         b = grid[row][col - 1],
                         c = grid[row - 1][col],
                         d = grid[row - 1][col - 1],
+                        capture = {row, col},
                         id = "alt 4"
                     }
                 else
@@ -110,6 +117,7 @@ function gridlock.check(params)
                         b = grid[row][col + 1],
                         c = grid[row + 1][col],
                         d = grid[row + 1][col + 1],
+                        capture = {row, col},
                         id = "Middle Class 1"
                     }
                     position["Middle Class 2"] = {
@@ -117,6 +125,7 @@ function gridlock.check(params)
                         b = grid[row][col - 1],
                         c = grid[row + 1][col],
                         d = grid[row + 1][col - 1],
+                        capture = {row, col},
                         id = "Middle Class 2"
                     }
                     position["Middle Class 3"] = {
@@ -124,6 +133,7 @@ function gridlock.check(params)
                         b = grid[row][col + 1],
                         c = grid[row - 1][col],
                         d = grid[row - 1][col + 1],
+                        capture = {row, col},
                         id = "Middle Class 3"
                     }
                     position["Middle Class 4"] = {
@@ -131,6 +141,7 @@ function gridlock.check(params)
                         b = grid[row][col - 1],
                         c = grid[row - 1][col],
                         d = grid[row][col - 1],
+                        capture = {row, col},
                         id = "Middle Class 4"
                     }
                 end
@@ -140,9 +151,9 @@ function gridlock.check(params)
 
     for k, _ in pairs(position) do
         if (k) then
-            local connection = Check(position[k])
-            if (connection) then
-                return true
+            local capture = Check(position[k])
+            if (capture) then
+                return capture
             end
         end
     end

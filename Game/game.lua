@@ -7,6 +7,7 @@ local gridlock = require('Game/grid-lock')
 -- Game Tables:
 local picked, connected = { }, { }
 local title, buttons, bg = { }, { }, { }
+local squares = { }
 local grid
 
 local function startGame(size)
@@ -226,7 +227,6 @@ function game.draw(dt)
                     end
                 end
 
-
                 local MX, MY = love.mouse.getPosition()
                 if intersecting(MX, MY, X, Y, 11, false) then
                     love.graphics.setLineWidth(grid.line_width + 1.5)
@@ -237,6 +237,21 @@ function game.draw(dt)
                 end
 
                 love.graphics.circle('line', X, Y, grid.radius)
+
+                local t = squares
+                for i = 1,#t do
+                    if (#t > 0) then
+
+                        local x = (t[i].x1 * grid.spacing) + (grid.x)
+                        local y = (t[i].y1 * grid.spacing) + (grid.y)
+                        local w,h = (t[i].x1 * grid.spacing), (t[i].y1 * grid.spacing)
+
+                        love.graphics.setLineWidth(3)
+                        love.graphics.setColor(119/255,136/255,153/255, 0.1)
+                        love.graphics.rectangle("fill", x, y, w,h, 15,15)
+
+                    end
+                end
             end
         end
     elseif (gamestate == "menu") then
@@ -298,6 +313,17 @@ function game.update(dt)
         imageButton.update(dt)
 
         if (click_count == 2) then
+
+            grid[picked[2].row][picked[2].col] = (currentPlayer + 1)
+            local params = { }
+            params.row, params.col = picked[2].row, picked[2].col
+            params.grid = grid
+
+            local capture = gridlock.Check(params)
+            if (capture) then
+                squares[#squares + 1] = {x1 = capture[1], y1 = capture[2]}
+            end
+
             currentPlayer = (currentPlayer + 1) % 2
 
             table.insert(connected, {
@@ -336,9 +362,6 @@ function love.mousepressed(x, y, button, isTouch)
             picked[click_count].col = point.col
 
             picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
-
-            local row,col = picked[2].row, picked[2].col
-            print(row,col)
 
             if connectionError() then
                 picked[2].x = 0
