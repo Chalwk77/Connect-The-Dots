@@ -2,6 +2,7 @@ local game = { }
 local GridModule = require('Game/board')
 local board = require('Game/board-select-menu')
 local imageButton = require('Game/image-button')
+local gridlock = require('Game/grid-lock')
 
 -- Game Tables:
 local picked, connected = { }, { }
@@ -75,8 +76,8 @@ function game.load(game)
     startPlayer = ( startPlayer + 1 ) % 2
     currentPlayer = startPlayer
 
-    for y = 1, 50 do
-        for x = 1, 50 do
+    for x = 1, 50 do
+        for y = 1, 50 do
             local X = (x * 32)
             local Y = (y * 32)
             table.insert(bg, {X, Y})
@@ -193,7 +194,7 @@ function game.draw(dt)
         end
 
         love.graphics.setFont(turnTextFont)
-        local x,y = grid.turn_text[1], grid.turn_text[2]
+        local x, y = grid.turn_text[1], grid.turn_text[2]
         love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", x, y, 0)
         --
 
@@ -201,8 +202,8 @@ function game.draw(dt)
         love.graphics.setLineWidth(grid.line_width)
         love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
 
-        for y = 1, #grid do
-            for x = 1, #grid[y] do
+        for x = 1, #grid do
+            for y = 1, #grid[x] do
 
                 local X = (x * grid.spacing) + (grid.x)
                 local Y = (y * grid.spacing) + (grid.y)
@@ -239,7 +240,7 @@ function game.draw(dt)
             end
         end
     elseif (gamestate == "menu") then
-        for k, v in ipairs(bg) do
+        for k, _ in ipairs(bg) do
             local X = bg[k][1]
             local Y = bg[k][2] - 100
             love.graphics.setLineWidth(3)
@@ -249,9 +250,9 @@ function game.draw(dt)
 
         -- About Message:
         love.graphics.setFont(smallPrintFont)
-        love.graphics.setColor(255/255, 255/255, 255/255, 1)
+        love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
 
-        for i = 1,#aboutMsg do
+        for i = 1, #aboutMsg do
 
             local text = aboutMsg[i][1]
             local height = aboutMsg[i][2]
@@ -266,6 +267,10 @@ function game.draw(dt)
     elseif (gamestate == "board-selection") then
         board.draw()
         imageButton.draw()
+    end
+
+    if gamestate == "playing" then
+
     end
 end
 
@@ -331,6 +336,10 @@ function love.mousepressed(x, y, button, isTouch)
             picked[click_count].col = point.col
 
             picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
+
+            local row,col = picked[2].row, picked[2].col
+            print(row,col)
+
             if connectionError() then
                 picked[2].x = 0
                 picked[2].y = 0
@@ -353,21 +362,7 @@ function game.keypressed(key)
 end
 
 function fillSquare()
-    local t = connected
 
-    -- ROWS:
-    for x = 1, #grid do
-        -- COLS:
-        for y = 1, #grid[x] do
-
-            for i = 1, #t do
-                if (t[i]) then
-
-                end
-            end
-
-        end
-    end
 end
 
 function connectionError()
@@ -446,8 +441,8 @@ local function hovering(x1, y1, x2, y2, r)
 end
 
 function intersecting(x1, y1, x2, y2, radius, bool)
-    for y = 1, #grid do
-        for x = 1, #grid[y] do
+    for x = 1, #grid do
+        for y = 1, #grid[x] do
 
             if (bool) then
                 x2 = (x * grid.spacing) + (grid.x)
@@ -504,19 +499,19 @@ function RenderMenuButtons()
             button_color = { 255 / 255, 0 / 255, 0 / 255, 1 }
         end
 
-        local text_color = {255/255, 255/255, 255/255, 1}
+        local text_color = {255 / 255, 255 / 255, 255 / 255, 1}
 
-        local curveX, curveY = 32,32
-        local curveX2, curveY2 = 32,32
+        local curveX, curveY = 32, 32
+        local curveX2, curveY2 = 32, 32
         if not (hovering) then
             love.graphics.setLineWidth(5)
             love.graphics.setColor(unpack(button_color))
         else
             love.graphics.setLineWidth(5)
-            curveX, curveY = curveX + 45, curveY  + 45
+            curveX, curveY = curveX + 45, curveY + 45
             curveX2, curveY2 = curveX2 + 400, curveY2 + 400
-            text_color = {0/255, 255/255, 0/255, 1}
-            love.graphics.setColor(255/255, 255/255, 255/255, 1)
+            text_color = {0 / 255, 255 / 255, 0 / 255, 1}
+            love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
         end
 
         local xOff, yOff = 30, 30
@@ -524,13 +519,13 @@ function RenderMenuButtons()
         local textH = button_font:getHeight(button.text)
 
         love.graphics.rectangle("line", bx, by, button_width, button_height, curveX, curveY)
-        love.graphics.setColor(255/255, 255/255, 255/255, 0.1)
-        love.graphics.rectangle("fill", bx + xOff/2 , by + yOff/2, button_width - xOff, button_height - xOff, curveX2, curveY2)
+        love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 0.1)
+        love.graphics.rectangle("fill", bx + xOff / 2, by + yOff / 2, button_width - xOff, button_height - xOff, curveX2, curveY2)
 
         -- Draw Dots between buttons ----------------------------------
-        love.graphics.setColor(255/255, 255/255, 255/255, 1)
+        love.graphics.setColor(255 / 255, 255 / 255, 255 / 255, 1)
         love.graphics.setLineWidth(10)
-        local x,y = 0,0
+        local x, y = 0, 0
         local dotW, dotH = 225, 112
         if (button.text == "Start Game") then
             x, y = bx + dotW, by + dotH
