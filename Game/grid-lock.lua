@@ -9,12 +9,9 @@ function gridlock.Check(params)
     local grid = params.grid
     local row,col = params.row, params.col
 
-    local captured = {}
-    
-        
     local x, y = row, col -- current row & column
     local capture = { }
-    
+
     -- TOP LEFT CORNER
     if (x == 1 and y == 1) then
         capture["Arrangement 1"] = {
@@ -76,9 +73,10 @@ function gridlock.Check(params)
             }
         end
     end
-    
-    for k,_ in pairs(tab) do                
-        if (k) and (#tab[k].a == 2 and #tab[k].b == 2 and #tab[k].c == 2 and #tab[k].d == 2) then
+
+    local c = capture
+    for k,_ in pairs(c) do
+        if (k) and (#c[k].a == 2 and #c[k].b == 2 and #c[k].c == 2 and #c[k].d == 2) then
             return true, print(k)
         end
         return false
