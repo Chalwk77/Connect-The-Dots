@@ -3,6 +3,7 @@ local GridModule = require('Game/board')
 local board = require('Game/board-select-menu')
 local imageButton = require('Game/image-button')
 local gridlock = require('Game/grid-lock')
+local prototype = require('Game/prototype')
 
 -- Game Tables:
 local picked, connected = { }, { }
@@ -52,6 +53,12 @@ end
 
 function game.load(game)
     local ww, wh = love.graphics.getDimensions()
+
+    for x = 1,#grid do
+        for y = 1, #grid[x] do
+            grid[x][y] = {}
+        end
+    end
 
     -- Set initial game state:
     gamestate = "menu"
@@ -199,7 +206,6 @@ function game.draw(dt)
         love.graphics.print("PLAYER " .. tostring(currentPlayer + 1 ) .. "'s TURN", x, y, 0)
         --
 
-
         love.graphics.setLineWidth(grid.line_width)
         love.graphics.setColor(255 / 255, 0 / 255, 0 / 255, 1)
 
@@ -242,9 +248,9 @@ function game.draw(dt)
                 for i = 1,#t do
                     if (#t > 0) then
 
-                        local x = (t[i].x1 * grid.spacing) + (grid.x)
-                        local y = (t[i].y1 * grid.spacing) + (grid.y)
-                        local w,h = (t[i].x1 * grid.spacing), (t[i].y1 * grid.spacing)
+                        local x = (t[i].x * grid.spacing) + (grid.x)
+                        local y = (t[i].y * grid.spacing) + (grid.y)
+                        local w,h = (t[i].x * grid.spacing), (t[i].y * grid.spacing)
 
                         love.graphics.setLineWidth(3)
                         love.graphics.setColor(119/255,136/255,153/255, 0.1)
@@ -314,16 +320,6 @@ function game.update(dt)
 
         if (click_count == 2) then
 
-            grid[picked[2].row][picked[2].col] = (currentPlayer + 1)
-            local params = { }
-            params.row, params.col = picked[2].row, picked[2].col
-            params.grid = grid
-
-            local capture = gridlock.Check(params)
-            if (capture) then
-                squares[#squares + 1] = {x1 = capture[1], y1 = capture[2]}
-            end
-
             currentPlayer = (currentPlayer + 1) % 2
 
             table.insert(connected, {
@@ -362,6 +358,26 @@ function love.mousepressed(x, y, button, isTouch)
             picked[click_count].col = point.col
 
             picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
+            
+            --========================================================================--            
+            local row,col = picked[click_count].row, picked[click_count].col
+            local function getState(row, col)
+                return #grid[row][col]
+            end
+            
+            if (getState(row, col) <= 1) then
+                table.insert(grid[row][col], "*")
+            end
+
+            local params = { }
+            params.row, params.col = picked[2].row, picked[2].col
+            params.grid = grid
+
+            local captured = gridlock.Check(params)
+            if (captured) then
+                squares[#squares + 1] = {x = row, y = col}
+            end
+            --========================================================================--
 
             if connectionError() then
                 picked[2].x = 0
