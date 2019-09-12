@@ -3,7 +3,6 @@ local GridModule = require('Game/board')
 local board = require('Game/board-select-menu')
 local imageButton = require('Game/image-button')
 local gridlock = require('Game/grid-lock')
-local prototype = require('Game/prototype')
 
 -- Game Tables:
 local picked, connected = { }, { }
@@ -358,13 +357,13 @@ function love.mousepressed(x, y, button, isTouch)
             picked[click_count].col = point.col
 
             picked[click_count].color = {0 / 255, 255 / 255, 0 / 255, 1}
-            
-            --========================================================================--            
+
+            --========================================================================--
             local row,col = picked[click_count].row, picked[click_count].col
             local function getState(row, col)
                 return #grid[row][col]
             end
-            
+
             if (getState(row, col) <= 1) then
                 table.insert(grid[row][col], "*")
             end
