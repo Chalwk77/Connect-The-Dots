@@ -5,12 +5,10 @@ local gridlock = { }
 
 function gridlock.Check(params)
     local params = params or { }
+    local capture = { }
 
     local grid = params.grid
-    local row, col = params.row, params.col
-
-    local x, y = row, col -- current row & column
-    local capture = { }
+    local x, y = params.row, params.col -- current row & column
 
     -- TOP LEFT CORNER
     if (x == 1 and y == 1) then
