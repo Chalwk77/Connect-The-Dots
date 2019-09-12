@@ -64,5 +64,12 @@ function SetBoard(size)
             {0, 0, 0, 0, 0, 0, 0, 0, 0}
         }
     end
+
+    for x = 1,#grid do
+        for y = 1, #grid[x] do
+            grid[x][y] = {}
+        end
+    end
+
     return grid
 end

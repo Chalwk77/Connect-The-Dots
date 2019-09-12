@@ -53,12 +53,6 @@ end
 function game.load(game)
     local ww, wh = love.graphics.getDimensions()
 
-    for x = 1,#grid do
-        for y = 1, #grid[x] do
-            grid[x][y] = {}
-        end
-    end
-
     -- Set initial game state:
     gamestate = "menu"
 
