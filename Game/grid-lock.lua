@@ -7,7 +7,7 @@ function gridlock.Check(params)
     local params = params or { }
 
     local grid = params.grid
-    local row,col = params.row, params.col
+    local row, col = params.row, params.col
 
     local x, y = row, col -- current row & column
     local capture = { }
@@ -18,31 +18,35 @@ function gridlock.Check(params)
             a = grid[x][y],
             b = grid[x][y + 1],
             c = grid[x + 1][y],
-            d = grid[x + 1][y + 1]
+            d = grid[x + 1][y + 1],
+            coords = {x = (x), y = (y)}
         }
-    -- TOP RIGHT CORNER
+        -- TOP RIGHT CORNER
     elseif (x == 1 and y == #grid[y]) then
         capture["Arrangement 2"] = {
             a = grid[x][y],
             b = grid[x][y - 1],
             c = grid[x + 1][y],
-            d = grid[x + 1][y - 1]
+            d = grid[x + 1][y - 1],
+            coords = {x = (x + 1), y = (1)}
         }
-    -- BOTTOM LEFT CORNER
+        -- BOTTOM LEFT CORNER
     elseif (x == #grid and y == 1) then
         capture["Arrangement 3"] = {
             a = grid[x][y],
             b = grid[x][y + 1],
             c = grid[x - 1][y],
-            d = grid[x - 1][y + 1]
+            d = grid[x - 1][y + 1],
+            coords = {x = (x), y = (y)}
         }
-    -- BOTTOM RIGHT CORNER
+        -- BOTTOM RIGHT CORNER
     elseif (x == #grid and y == #grid[y]) then
         capture["Arrangement 4"] = {
             a = grid[x][y],
             b = grid[x][y - 1],
             c = grid[x - 1][y],
-            d = grid[x - 1][y - 1]
+            d = grid[x - 1][y - 1],
+            coords = {x = (x - 1), y = (y - 1)}
         }
     elseif (y > 1 and y < #grid[x]) then
         if (x >= 1 and x < #grid) then
@@ -50,34 +54,38 @@ function gridlock.Check(params)
                 a = grid[x][y],
                 b = grid[x][y + 1],
                 c = grid[x + 1][y],
-                d = grid[x + 1][y + 1]
+                d = grid[x + 1][y + 1],
+                coords = {x = (x - 1), y = (y - 1)}
             }
             capture["Arrangement 6"] = { -- Facing Left
                 a = grid[x][y],
                 b = grid[x][y - 1],
                 c = grid[x + 1][y],
-                d = grid[x + 1][y - 1]
+                d = grid[x + 1][y - 1],
+                coords = {x = (x - 1), y = (y - 1)}
             }
         elseif (x == #grid) then
             capture["Arrangement 7"] = {
                 a = grid[x][y],
                 b = grid[x][y + 1],
                 c = grid[x - 1][y],
-                d = grid[x - 1][y + 1]
+                d = grid[x - 1][y + 1],
+                coords = {x = (x - 1), y = (y - 1)}
             }
             capture["Arrangement 8"] = {
                 a = grid[x][y],
                 b = grid[x][y - 1],
                 c = grid[x - 1][y],
-                d = grid[x - 1][y - 1]
+                d = grid[x - 1][y - 1],
+                coords = {x = (x - 1), y = (y - 1)}
             }
         end
     end
 
     local c = capture
-    for k,_ in pairs(c) do
+    for k, _ in pairs(c) do
         if (k) and (#c[k].a == 2 and #c[k].b == 2 and #c[k].c == 2 and #c[k].d == 2) then
-            return true, print(k)
+            return c[k].coords, print(k)
         end
         return false
     end

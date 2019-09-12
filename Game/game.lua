@@ -241,16 +241,16 @@ function game.draw(dt)
                 love.graphics.circle('line', X, Y, grid.radius)
 
                 local t = squares
-                for i = 1,#t do
-                    if (#t > 0) then
+                if (#t > 0) then
+                    for i = 1,#t do
 
-                        local x = (t[i].x * grid.spacing) + (grid.x)
-                        local y = (t[i].y * grid.spacing) + (grid.y)
-                        local w,h = (t[i].x * grid.spacing), (t[i].y * grid.spacing)
+                        local newX = (t[i].x * grid.spacing) + (grid.x)
+                        local newY = (t[i].y * grid.spacing) + (grid.y)
 
+                        local W,H = (grid.spacing), (grid.spacing)
                         love.graphics.setLineWidth(3)
-                        love.graphics.setColor(119/255,136/255,153/255, 0.1)
-                        love.graphics.rectangle("fill", x, y, w,h, 15,15)
+                        love.graphics.setColor(0/255,255/255,0/255, 1)
+                        love.graphics.rectangle("fill", newX, newY, W,H, 15,15)
 
                     end
                 end
@@ -366,13 +366,16 @@ function love.mousepressed(x, y, button, isTouch)
             end
 
             if (click_count == 2) then
+                local row,col = picked[2].row, picked[2].col
+
                 local params = { }
                 params.row, params.col = row,col
                 params.grid = grid
 
                 local captured = gridlock.Check(params)
                 if (captured) then
-                    squares[#squares + 1] = {x = row, y = col}
+                    local x,y = captured.x, captured.y
+                    squares[#squares + 1] = {x = x, y = y}
                 end
             end
             --========================================================================--
@@ -384,6 +387,9 @@ function love.mousepressed(x, y, button, isTouch)
                 picked[2].row = 0
                 picked[2].col = 0
                 click_count = click_count - 1
+
+                -- table.remove(squares, #squares)
+
                 if (#connected > 0) then
                     table.remove(connected[#connected])
                 end
