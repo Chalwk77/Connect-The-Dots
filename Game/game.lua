@@ -7,10 +7,13 @@ local gridlock = require('Game/grid-lock')
 -- Game Tables:
 local picked, connected = { }, { }
 local title, buttons, bg = { }, { }, { }
-local squares = { }
+local squares
 local grid
 
 local function startGame(size)
+    squares = { } -- Init this table
+    connected = { }
+
     grid = SetBoard(size)
     gamestate = "playing"
 end
@@ -362,13 +365,15 @@ function love.mousepressed(x, y, button, isTouch)
                 table.insert(grid[row][col], "*")
             end
 
-            local params = { }
-            params.row, params.col = picked[2].row, picked[2].col
-            params.grid = grid
+            if (click_count == 2) then
+                local params = { }
+                params.row, params.col = row,col
+                params.grid = grid
 
-            local captured = gridlock.Check(params)
-            if (captured) then
-                squares[#squares + 1] = {x = row, y = col}
+                local captured = gridlock.Check(params)
+                if (captured) then
+                    squares[#squares + 1] = {x = row, y = col}
+                end
             end
             --========================================================================--
 
