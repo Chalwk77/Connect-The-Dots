@@ -245,10 +245,9 @@ function game.draw(dt)
 
                         love.graphics.setLineWidth(5)
                         love.graphics.setColor(0 / 255, 0 / 255, 255 / 255, 1)
-                        love.graphics.circle('line', X, Y, 10)
+                        love.graphics.circle('line', X - 1, Y, 9)
                     end
                 end
-
             end
         end
 
@@ -339,7 +338,6 @@ function game.update(dt)
     end
 
     if (gamestate == "playing") then
-
         imageButton.update(dt)
 
         if (click_count == 2) then
@@ -395,15 +393,14 @@ function love.mousepressed(x, y, button, isTouch)
 
             if (click_count == 2) then
                 local row,col = picked[2].row, picked[2].col
-
                 local params = { }
                 params.row, params.col = row,col
                 params.grid = grid
 
                 local captured = gridlock.Check(params)
                 if (captured) then
-                    local x,y = captured.x, captured.y
-                    squares[#squares + 1] = {x = x, y = y}
+                    local X,Y = captured.x, captured.y
+                    squares[#squares + 1] = {x = X, y = Y}
                 end
             end
             --========================================================================--
@@ -415,9 +412,6 @@ function love.mousepressed(x, y, button, isTouch)
                 picked[2].row = 0
                 picked[2].col = 0
                 click_count = click_count - 1
-
-                -- table.remove(squares, #squares)
-
                 if (#connected > 0) then
                     table.remove(connected[#connected])
                 end
@@ -525,7 +519,7 @@ function intersecting(x1, y1, x2, y2, radius, bool)
             if (intersect) and not (bool) then
                 return true
             elseif (intersect) and (bool) then
-                return {x = x2, y = y2, row = y, col = x}
+                return {x = x2, y = y2, row = x, col = y}
             end
         end
     end

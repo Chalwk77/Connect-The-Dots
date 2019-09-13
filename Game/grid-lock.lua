@@ -20,13 +20,13 @@ function gridlock.Check(params)
             coords = {x = (x), y = (y)}
         }
         -- TOP RIGHT CORNER
-    elseif (x == 1 and y == #grid[y]) then
+    elseif (x == 1 and y == #grid[x]) then
         capture["Arrangement 2"] = {
             a = grid[x][y],
             b = grid[x][y - 1],
             c = grid[x + 1][y],
             d = grid[x + 1][y - 1],
-            coords = {x = (x + 1), y = (1)}
+            coords = {x = (x), y = (y)}
         }
         -- BOTTOM LEFT CORNER
     elseif (x == #grid and y == 1) then
@@ -38,7 +38,7 @@ function gridlock.Check(params)
             coords = {x = (x), y = (y)}
         }
         -- BOTTOM RIGHT CORNER
-    elseif (x == #grid and y == #grid[y]) then
+    elseif (x == #grid and y == #grid[x]) then
         capture["Arrangement 4"] = {
             a = grid[x][y],
             b = grid[x][y - 1],
