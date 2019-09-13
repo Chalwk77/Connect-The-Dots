@@ -220,15 +220,6 @@ function game.draw(dt)
                     end
                 end
 
-                local t = connected
-                for i = 1, #t do
-                    if (t[i]) then
-                        love.graphics.setLineWidth(1)
-                        love.graphics.setColor(unpack(t[i].color))
-                        love.graphics.line(t[i].x1, t[i].y1, t[i].x2, t[i].y2, 0, 0, 0, 0)
-                    end
-                end
-
                 local MX, MY = love.mouse.getPosition()
                 if intersecting(MX, MY, X, Y, 11, false) then
                     love.graphics.setLineWidth(grid.line_width + 1.5)
@@ -240,22 +231,59 @@ function game.draw(dt)
 
                 love.graphics.circle('line', X, Y, grid.radius)
 
-                local t = squares
-                if (#t > 0) then
-                    for i = 1,#t do
+                if (click_count == 1) then
 
-                        local newX = (t[i].x * grid.spacing) + (grid.x)
-                        local newY = (t[i].y * grid.spacing) + (grid.y)
+                    local px, py = picked[1].row, picked[1].col
 
-                        local W,H = (grid.spacing), (grid.spacing)
-                        love.graphics.setLineWidth(3)
-                        love.graphics.setColor(0/255,255/255,0/255, 1)
-                        love.graphics.rectangle("fill", newX, newY, W,H, 15,15)
+                    local top = {px - 1, py}
+                    local bottom = {px + 1, py}
+                    local left = {px, py - 1}
+                    local right = {px, py + 1}
 
+                    if (x == top[1] and y == top[2]) or (x == bottom[1] and y == bottom[2]) or
+                    (x == left[1] and y == left[2]) or (x == right[1] and y == right[2]) then
+
+                        love.graphics.setLineWidth(5)
+                        love.graphics.setColor(0 / 255, 0 / 255, 255 / 255, 1)
+                        love.graphics.circle('line', X, Y, 10)
                     end
                 end
+
             end
         end
+
+        -- -- Draw Line from DOTA X,Y to Mouse X,Y
+        -- if (click_count == 1) then
+        --     local MX, MY = love.mouse.getPosition()
+        --     love.graphics.setLineWidth(3)
+        --     love.graphics.setColor(100 / 255, 100 / 255, 100 / 255, 1)
+        --     love.graphics.line(picked[1].x, picked[1].y, MX, MY, 0, 0, 0, 0)
+        -- end
+
+        local t = connected
+        for i = 1, #t do
+            if (t[i]) then
+                love.graphics.setLineWidth(1)
+                love.graphics.setColor(unpack(t[i].color))
+                love.graphics.line(t[i].x1, t[i].y1, t[i].x2, t[i].y2, 0, 0, 0, 0)
+            end
+        end
+
+        local t = squares
+        if (#t > 0) then
+            for i = 1,#t do
+
+                local X = (t[i].x * grid.spacing) + (grid.x)
+                local Y = (t[i].y * grid.spacing) + (grid.y)
+
+                local W,H = (grid.spacing), (grid.spacing)
+                love.graphics.setLineWidth(3)
+                love.graphics.setColor(0/255,255/255,0/255, 1)
+                love.graphics.rectangle("fill", X, Y, W,H, 15,15)
+
+            end
+        end
+
     elseif (gamestate == "menu") then
         for k, _ in ipairs(bg) do
             local X = bg[k][1]
